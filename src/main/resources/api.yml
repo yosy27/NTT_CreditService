@@ -1,0 +1,254 @@
+openapi: 3.0.3
+info:
+  title: Credit Service API
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8585
+
+paths:
+  /api/credits:
+    post:
+      summary: Registrar credito
+      operationId: registerCredit
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreditRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Credit'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '409':
+          description: Business rule violation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    get:
+      summary: Lista de creditos
+      operationId: listCredits
+      responses:
+        '200':
+          description: Lista de creditos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageCredit'
+
+  /api/credits/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Credito por ID
+      operationId: getCredit
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Credit'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    put:
+      summary: Actualizar credito
+      operationId: replaceCredit
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreditUpdateRequest'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Credit'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '409':
+          description: Business rule violation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    delete:
+      summary: Eliminar credito
+      operationId: deleteCredit
+      responses:
+        '204':
+          description: Deleted
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+components:
+  schemas:
+    CreditType:
+      type: string
+      enum: [PERSONAL, BUSINESS, CREDIT_CARD]
+
+    CreditStatus:
+      type: string
+      enum: [ACTIVE, INACTIVE]
+
+    Card:
+      type: object
+      properties:
+        id: { type: string }
+        last4:
+          type: string
+          pattern: '^[0-9]{4}$'
+          description: Últimos 4 dígitos
+        brand:
+          type: string
+          example: VISA
+
+    Credit:
+      type: object
+      required:
+        - id
+        - customerId
+        - type
+        - limit
+        - balance
+        - interestAnnual
+        - status
+        - createdAt
+      properties:
+        id:
+          type: string
+          description: Identificador del crédito (ObjectId/UUID)
+        customerId:
+          type: string
+          description: Id del cliente (personal o empresarial)
+        type:
+          $ref: '#/components/schemas/CreditType'
+        limit:
+          type: number
+          format: double
+          minimum: 0
+          example: 5000
+        balance:
+          type: number
+          format: double
+          minimum: 0
+          example: 200
+        interestAnnual:
+          type: number
+          format: double
+          minimum: 0
+          description: Porcentaje de interés anual
+          example: 110
+        dueDate:
+          type: string
+          format: date
+          description: Día de pago (mensual)
+          example: '2025-09-05'
+        status:
+          $ref: '#/components/schemas/CreditStatus'
+        card:
+          $ref: '#/components/schemas/Card'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CreditRequest:
+      type: object
+      required:
+        - customerId
+        - type
+        - limit
+        - interestAnnual
+      properties:
+        customerId: { type: string }
+        type: { $ref: '#/components/schemas/CreditType' }
+        limit:
+          type: number
+          format: double
+          minimum: 0
+        interestAnnual:
+          type: number
+          format: double
+          minimum: 0
+        dueDate:
+          type: string
+          format: date
+        card:
+          $ref: '#/components/schemas/Card'
+      description: >
+        Reglas: PERSONAL (un crédito activo por cliente), BUSINESS (múltiples),
+        CREDIT_CARD (consumos no pueden exceder el límite disponible).
+
+    CreditUpdateRequest:
+      allOf:
+        - $ref: '#/components/schemas/Credit'
+      description: Reemplazo total (PUT). El id del recurso viene en la ruta.
+
+    PageMeta:
+      type: object
+      properties:
+        page: { type: integer, example: 0 }
+        size: { type: integer, example: 20 }
+        totalElements: { type: integer, example: 135 }
+        totalPages: { type: integer, example: 7 }
+        hasNext: { type: boolean, example: true }
+
+    PageCredit:
+      type: object
+      properties:
+        content:
+          type: array
+          items: { $ref: '#/components/schemas/Credit' }
+        page:
+          $ref: '#/components/schemas/PageMeta'
+
+    Problem:
+      type: object
+      description: RFC7807 Problem Details
+      properties:
+        type: { type: string, format: uri }
+        title: { type: string }
+        status: { type: integer }
+        detail: { type: string }
+        instance: { type: string, format: uri }
+        code:
+          type: string
+          description: Código de negocio (p.ej. PERSONAL_CREDIT_ALREADY_EXISTS, CARD_LIMIT_EXCEEDED)
