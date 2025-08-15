@@ -4,12 +4,16 @@ info:
   version: 1.0.0
 
 servers:
-  - url: http://localhost:8585
+  - url: http://localhost:8585/api/v1
+
+tags:
+  - name: Credits
 
 paths:
-  /api/credits:
+  /credits:
     post:
-      summary: Registrar credito
+      tags: [Credits]
+      summary: Register credit
       operationId: registerCredit
       requestBody:
         required: true
@@ -37,7 +41,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Problem'
     get:
-      summary: Lista de creditos
+      tags: [ Credits ]
+      summary: List credits
       operationId: listCredits
       responses:
         '200':
@@ -45,9 +50,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PageCredit'
+                $ref: '#/components/schemas/Credit'
 
-  /api/credits/{id}:
+  /credits/{id}:
     parameters:
       - name: id
         in: path
@@ -55,7 +60,8 @@ paths:
         schema:
           type: string
     get:
-      summary: Credito por ID
+      tags: [ Credits ]
+      summary: Get credit by id
       operationId: getCredit
       responses:
         '200':
@@ -71,8 +77,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/Problem'
     put:
-      summary: Actualizar credito
-      operationId: replaceCredit
+      tags: [ Credits ]
+      summary: Update credit
+      operationId: updateCredit
       requestBody:
         required: true
         content:
@@ -105,6 +112,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Problem'
     delete:
+      tags: [ Credits ]
       summary: Eliminar credito
       operationId: deleteCredit
       responses:
@@ -221,24 +229,6 @@ components:
       allOf:
         - $ref: '#/components/schemas/Credit'
       description: Reemplazo total (PUT). El id del recurso viene en la ruta.
-
-    PageMeta:
-      type: object
-      properties:
-        page: { type: integer, example: 0 }
-        size: { type: integer, example: 20 }
-        totalElements: { type: integer, example: 135 }
-        totalPages: { type: integer, example: 7 }
-        hasNext: { type: boolean, example: true }
-
-    PageCredit:
-      type: object
-      properties:
-        content:
-          type: array
-          items: { $ref: '#/components/schemas/Credit' }
-        page:
-          $ref: '#/components/schemas/PageMeta'
 
     Problem:
       type: object
