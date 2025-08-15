@@ -55,17 +55,11 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- Swagger UI para WebFlux con OpenAPI 3 -->
+		<!-- OpenAPI Generator support -->
 		<dependency>
-			<groupId>org.springdoc</groupId>
-			<artifactId>springdoc-openapi-webflux-ui</artifactId>
-			<version>1.7.0</version>
-		</dependency>
-
-		<dependency>
-			<groupId>io.swagger</groupId>
-			<artifactId>swagger-annotations</artifactId>
-			<version>1.6.13</version>
+			<groupId>org.openapitools</groupId>
+			<artifactId>jackson-databind-nullable</artifactId>
+			<version>0.2.6</version>
 		</dependency>
 
 		<!-- Springfox  -->
@@ -75,18 +69,17 @@
 			<version>3.0.0</version>
 		</dependency>
 
-		<!-- Soporte para openapitools -->
+		<!-- Soporte para openapitools
 		<dependency>
 			<groupId>org.openapitools</groupId>
 			<artifactId>jackson-databind-nullable</artifactId>
 			<version>0.2.6</version>
-		</dependency>
+		</dependency>-->
 
 	</dependencies>
 
 	<build>
 		<plugins>
-			<!-- Annotation processors -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -101,7 +94,7 @@
 				</configuration>
 			</plugin>
 
-			<!-- Generación de código desde api.yml  -->
+			<!-- Generación desde api.yml  -->
 			<plugin>
 				<groupId>org.openapitools</groupId>
 				<artifactId>openapi-generator-maven-plugin</artifactId>
@@ -124,13 +117,13 @@
 							<configOptions>
 								<delegatePattern>true</delegatePattern>
 								<reactive>true</reactive>
+								<useSpringfox>true</useSpringfox>
 							</configOptions>
 						</configuration>
 					</execution>
 				</executions>
 			</plugin>
 
-			<!-- Spring Boot -->
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
