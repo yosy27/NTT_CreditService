@@ -46,11 +46,13 @@ paths:
       operationId: listCredits
       responses:
         '200':
-          description: Lista de creditos
+          description: List credits
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Credit'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Credit'
 
   /credits/{id}:
     parameters:
@@ -113,7 +115,7 @@ paths:
                 $ref: '#/components/schemas/Problem'
     delete:
       tags: [ Credits ]
-      summary: Eliminar credito
+      summary: Delete credit
       operationId: deleteCredit
       responses:
         '204':
