@@ -30,16 +30,8 @@ paths:
                 $ref: '#/components/schemas/Credit'
         '400':
           description: Validation error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Problem'
         '409':
           description: Business rule violation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Problem'
     get:
       tags: [ Credits ]
       summary: List credits
@@ -74,10 +66,6 @@ paths:
                 $ref: '#/components/schemas/Credit'
         '404':
           description: Not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Problem'
     put:
       tags: [ Credits ]
       summary: Update credit
@@ -97,22 +85,10 @@ paths:
                 $ref: '#/components/schemas/Credit'
         '400':
           description: Validation error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Problem'
         '404':
           description: Not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Problem'
         '409':
           description: Business rule violation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Problem'
     delete:
       tags: [ Credits ]
       summary: Delete credit
@@ -122,10 +98,6 @@ paths:
           description: Deleted
         '404':
           description: Not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Problem'
 components:
   schemas:
     CreditType:
@@ -231,16 +203,3 @@ components:
       allOf:
         - $ref: '#/components/schemas/Credit'
       description: Reemplazo total (PUT). El id del recurso viene en la ruta.
-
-    Problem:
-      type: object
-      description: RFC7807 Problem Details
-      properties:
-        type: { type: string, format: uri }
-        title: { type: string }
-        status: { type: integer }
-        detail: { type: string }
-        instance: { type: string, format: uri }
-        code:
-          type: string
-          description: Código de negocio (p.ej. PERSONAL_CREDIT_ALREADY_EXISTS, CARD_LIMIT_EXCEEDED)
