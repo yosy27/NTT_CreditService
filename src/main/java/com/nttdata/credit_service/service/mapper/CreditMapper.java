@@ -1,4 +1,4 @@
-package com.nttdata.credit_service.service;
+package com.nttdata.credit_service.service.mapper;
 
 import com.nttdata.credit.model.*;
 import com.nttdata.credit_service.persistence.CreditDocument;
@@ -7,14 +7,13 @@ import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 
-/**
- *  * Utilidad de mapeo entre los modelos de la API (requests/responses)
- *  * y el documento de persistencia en MongoDB.
- */
+
+//Utilidad de mapeo entre los modelos de la API
+// y el documento de persistencia en MongoDB
 public final class CreditMapper {
-    private CreditMapper(){}
+    private CreditMapper(){} // Clase utilitaria
 
-
+    // Convierte un CreditRequest en un CreditDocument para guardad en la bd
     public static CreditDocument toDoc(CreditRequest r){
         CreditDocument d = new CreditDocument();
         d.setCustomerId(r.getCustomerId());
@@ -23,6 +22,7 @@ public final class CreditMapper {
         d.setBalance(0.0);
         d.setInterestAnnual(r.getInterestAnnual());
         d.setDueDate(r.getDueDate() != null ? r.getDueDate().toString() : null); // LocalDate -> String (ISO)
+        // Si viene tarjeta mapear sus campos
         if (r.getCard() != null) {
             d.setCardId(r.getCard().getId());
             d.setCardLast4(r.getCard().getLast4());
@@ -34,6 +34,7 @@ public final class CreditMapper {
         return d;
     }
 
+    // Aplica una actualización sobre un documento existente
     public static void applyUpdate(CreditDocument d, CreditUpdateRequest r){
         d.setCustomerId(r.getCustomerId());
         d.setType(r.getType()); // enum directo
@@ -54,6 +55,7 @@ public final class CreditMapper {
         d.setUpdatedAt(OffsetDateTime.now().toInstant());
     }
 
+    // Convierte un CreditDocument en un Credit
     public static Credit toApi(CreditDocument d){
         Credit c = new Credit()
                 .id(d.getId())
