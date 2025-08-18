@@ -6,7 +6,7 @@ La arquitectura está basada en microservicios, donde cada servicio es responsab
 
 
 ## Diagrama de Flujo General
-![Diagrama de Flujo General](./docs/Diagrama UML Proyecto.jpg )
+![Diagrama de Flujo General](./docs/Diagrama%20UML%20Proyecto.jpg)
 
 ## Diagrama de Secuencia - Microservicio Credits
 ![Diagrama de Secuencia - Credits](./docs/diagrama%20secuencia%20credits.png)
