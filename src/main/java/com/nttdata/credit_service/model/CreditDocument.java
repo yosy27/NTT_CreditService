@@ -1,4 +1,4 @@
-package com.nttdata.credit_service.persistence;
+package com.nttdata.credit_service.model;
 
 import com.nttdata.credit.model.CreditStatus;
 import com.nttdata.credit.model.CreditType;
@@ -6,8 +6,6 @@ import com.nttdata.credit.model.CreditType;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.time.OffsetDateTime;
 
 /**
  * Entidad de persistencia que representa un producto de crédito
