@@ -1,7 +1,7 @@
 package com.nttdata.credit_service.service.mapper;
 
 import com.nttdata.credit.model.*;
-import com.nttdata.credit_service.persistence.CreditDocument;
+import com.nttdata.credit_service.model.CreditDocument;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
