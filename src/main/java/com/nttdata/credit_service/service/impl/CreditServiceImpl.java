@@ -1,8 +1,8 @@
 package com.nttdata.credit_service.service.impl;
 
 import com.nttdata.credit.model.*;
-import com.nttdata.credit_service.persistence.CreditDocument;
-import com.nttdata.credit_service.persistence.CreditRepository;
+import com.nttdata.credit_service.model.CreditDocument;
+import com.nttdata.credit_service.repository.CreditRepository;
 import com.nttdata.credit_service.service.mapper.CreditMapper;
 import com.nttdata.credit_service.service.CreditService;
 import lombok.RequiredArgsConstructor;
