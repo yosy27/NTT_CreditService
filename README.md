@@ -8,7 +8,7 @@ El microservicio **Credits** se encarga de **administrar los créditos de client
 Su responsabilidad es manejar el ciclo de vida de los créditos y sus operaciones de negocio.
 
 ## Diagrama de Flujo General
-![Diagrama de Flujo General](./docs/Diagrama%20UML%20Proyecto.jpg)
+![Diagrama de Flujo General](./docs/DiagramaGeneral.jpg)
 
 ## Diagrama de Secuencia - Microservicio Credits
 ![Diagrama de Secuencia - Credits](./docs/diagrama%20secuencia%20credits.png)
