@@ -3,58 +3,68 @@ info:
   title: Credit Service API
   version: 1.0.0
   description: >
-    API para la gestión de créditos bancarios
+    API para la gestión de créditos bancarios.
     Permite registrar créditos, aplicar pagos, registrar consumos (cargos),
-    consultar saldos y administrar la información de los créditos.
+    consultar saldos, listar movimientos y consultar créditos por cliente o documento.
 
 servers:
-  - url: http://localhost:8585/api/v1
+  - url: http://localhost:8585/
 
 tags:
   - name: Credits
     description: Operaciones relacionadas con créditos (CRUD y negocio)
 
+
 paths:
   /credits:
     post:
       tags: [Credits]
-      summary: Register credit
+      summary: Registrar crédito
       description: >
-        Crea un nuevo crédito para un cliente (personal, empresarial o tarjeta de crédito).  
-        Reglas:  
-        - PERSONAL: solo se permite un crédito activo por cliente.  
-        - BUSINESS: se permiten múltiples créditos.  
-        - CREDIT_CARD: no puede exceder el límite disponible en consumos.
+        Crea un nuevo crédito para un cliente (PERSONAL, BUSINESS o CREDIT_CARD).
+        Reglas:
+        - PERSONAL: solo se permite un crédito activo por cliente.
+        - BUSINESS: se permiten múltiples créditos.
+        - CREDIT_CARD: los consumos no pueden exceder el límite disponible.
       operationId: registerCredit
       requestBody:
         required: true
         content:
           application/json:
-            schema:
-              $ref: '#/components/schemas/CreditRequest'
+            schema: { $ref: '#/components/schemas/CreditCreate' }
       responses:
         '201':
           description: Crédito creado exitosamente
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/Credit'
-        '400':
-          description: Error de validación en los datos enviados
-        '409':
-          description: Violación de reglas de negocio
+              schema: { $ref: '#/components/schemas/Credit' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/UnprocessableEntity' }
+
     get:
       tags: [ Credits ]
-      summary: List credits
+      summary: Listar créditos
       description: >
-        Lista todos los créditos registrados.  
-        Se puede filtrar opcionalmente por `customerId`.
+        Lista créditos con filtros. Por defecto retorna solo créditos activos.
       operationId: listCredits
       parameters:
         - in: query
           name: customerId
           schema: { type: string }
-          description: Filtrar créditos por el ID del cliente
+          description: Filtra por ID del cliente.
+        - in: query
+          name: type
+          schema: { $ref: '#/components/schemas/CreditType' }
+          description: Filtra por tipo de crédito.
+        - in: query
+          name: status
+          schema: { $ref: '#/components/schemas/CreditStatus' }
+          description: Filtra por estado del crédito.
+        - in: query
+          name: includeClosed
+          schema: { type: boolean, default: false }
+          description: Incluir créditos cerrados (CLOSED).
       responses:
         '200':
           description: Lista de créditos
@@ -62,307 +72,633 @@ paths:
             application/json:
               schema:
                 type: array
-                items:
-                  $ref: '#/components/schemas/Credit'
+                items: { $ref: '#/components/schemas/Credit' }
+
+  /customers/{customerId}/credits:
+    get:
+      tags: [Credits]
+      summary: Listar créditos por cliente
+      description: Devuelve los créditos asociados a un cliente específico.
+      operationId: listCreditsByCustomer
+      parameters:
+        - in: path
+          name: customerId
+          required: true
+          schema: { type: string }
+          description: Identificador del cliente.
+        - in: query
+          name: type
+          schema: { $ref: '#/components/schemas/CreditType' }
+          description: Filtra por tipo de crédito.
+        - in: query
+          name: status
+          schema: { $ref: '#/components/schemas/CreditStatus' }
+          description: Filtra por estado del crédito.
+      responses:
+        '200':
+          description: Lista de créditos del cliente
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Credit' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /credits/search:
+    get:
+      tags: [Credits]
+      summary: Buscar créditos por documento de cliente
+      description: >
+        Devuelve los créditos de un cliente a partir de su número de documento.
+      operationId: searchCreditsByDocument
+      parameters:
+        - in: query
+          name: documentType
+          required: true
+          schema: { $ref: '#/components/schemas/DocumentType' }
+          description: Tipo de documento (DNI, RUC, CE).
+        - in: query
+          name: documentNumber
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Lista de créditos encontrados
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Credit' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
 
   /credits/{id}:
     parameters:
       - name: id
         in: path
         required: true
-        schema:
-          type: string
-        description: Identificador único del crédito
+        schema: { type: string }
+        description: Identificador único del crédito.
     get:
-      tags: [ Credits ]
-      summary: Get credit by id
-      description: Obtiene la información detallada de un crédito por su ID.
+      tags: [Credits]
+      summary: Obtener crédito por ID
       operationId: getCredit
       responses:
         '200':
           description: Crédito encontrado
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/Credit'
-        '404':
-          description: Crédito no encontrado
-    put:
-      tags: [ Credits ]
-      summary: Update credit
-      description: Actualiza la información de un crédito existente (reemplazo total).
-      operationId: updateCredit
+              schema: { $ref: '#/components/schemas/Credit' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    patch:
+      tags: [Credits]
+      summary: Actualización parcial de campos permitidos
+      description: >
+        Actualiza parcialmente campos del crédito .
+        Campos de solo lectura (id, customerId, type, balance, status, createdAt, closedAt, updatedAt) no pueden modificarse.
+      operationId: patchCredit
+      requestBody:
+        required: true
+        content:
+          application/merge-patch+json:
+            schema: { $ref: '#/components/schemas/CreditUpdate' }
+      responses:
+        '200':
+          description: Crédito actualizado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Credit' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+
+  /credits/{id}/close:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+        description: Identificador único del crédito.
+    post:
+      tags: [Credits]
+      summary: Cerrar crédito (borrado lógico)
+      description: >
+        Cierra el crédito realizando borrado lógico (status=CLOSED y `closedAt`).
+        Requiere `balance = 0`. No elimina físicamente el documento.
+      operationId: closeCredit
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreditCloseRequest' }
+      responses:
+        '200':
+          description: Crédito cerrado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Credit' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+
+  /credits/{id}/limit:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+        description: Identificador único del crédito.
+    patch:
+      tags: [Credits]
+      summary: Ajustar límite de crédito
+      description: >
+        Modifica el límite del crédito. Requiere que el nuevo límite sea **≥ balance** actual.
+        Registra motivo de auditoría.
+      operationId: adjustLimit
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreditUpdateRequest'
+              type: object
+              additionalProperties: false
+              required: [newLimit]
+              properties:
+                newLimit:
+                  type: number
+                  minimum: 0
+                reason:
+                  type: string
+                  maxLength: 200
+                  description: Motivo del ajuste (auditoría).
       responses:
         '200':
-          description: Crédito actualizado correctamente
+          description: Límite actualizado
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/Credit'
-        '400':
-          description: Error de validación
-        '404':
-          description: Crédito no encontrado
+              schema: { $ref: '#/components/schemas/Credit' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
         '409':
-          description: Violación de reglas de negocio
-    delete:
-      tags: [ Credits ]
-      summary: Delete credit
-      description: Elimina un crédito por ID
-      operationId: deleteCredit
-      responses:
-        '204':
-          description: Crédito eliminado
-        '404':
-          description: Crédito no encontrado
+          description: Regla de negocio violada (nuevo límite menor al balance).
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
   /credits/{id}/payments:
     post:
-      tags: [ Credits ]
-      summary: Apply payment to a credit
+      tags: [Credits]
+      summary: Aplicar pago a un crédito
       description: >
-        Aplica un pago al crédito identificado por `id` y  
-        disminuye el balance en el monto indicado.  
-        Si el pago excede el balance, este se reduce a 0.
+        Registra un pago (del titular o de terceros) asociado al crédito.
       operationId: applyPayment
       parameters:
-        - name: id
-          in: path
+        - in: path
+          name: id
           required: true
           schema: { type: string }
-          description: Identificador del crédito
       requestBody:
         required: true
         content:
           application/json:
-            schema:
-              $ref: '#/components/schemas/CreditPaymentRequest'
+            schema: { $ref: '#/components/schemas/CreditPaymentRequest' }
       responses:
-        '200':
-          description: Pago aplicado correctamente
+        '201':
+          description: Pago registrado
+          headers:
+            Location:
+              description: URI del movimiento (pago) creado.
+              schema: { type: string, format: uri }
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/CreditBalance'
-        '400': { description: Error de validación }
-        '404': { description: Crédito no encontrado }
+              schema: { $ref: '#/components/schemas/CreditMovement' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+
   /credits/{id}/charges:
     post:
-      tags: [ Credits ]
-      summary: Apply charge (purchase/expense)
+      tags: [Credits]
+      summary: Aplicar cargo (consumo)
       description: >
-        Aplica un cargo a un crédito o tarjeta de crédito.  
-        Valida que en el caso de tarjetas no se exceda el límite disponible.
+        Registra un cargo/consumo. Para `CREDIT_CARD`, valida que el consumo no exceda el **disponible**.
       operationId: applyCharge
       parameters:
-        - name: id
-          in: path
+        - in: path
+          name: id
           required: true
           schema: { type: string }
-          description: Identificador del crédito
       requestBody:
         required: true
         content:
           application/json:
-            schema:
-              $ref: '#/components/schemas/CreditChargeRequest'
+            schema: { $ref: '#/components/schemas/CreditChargeRequest' }
       responses:
-        '200':
-          description: Cargo aplicado correctamente
+        '201':
+          description: Cargo registrado
+          headers:
+            Location:
+              description: URI del movimiento (cargo) creado.
+              schema: { type: string, format: uri }
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/CreditBalance'
-        '400': { description: Error de validación }
-        '404': { description: Crédito no encontrado }
-        '422': { description: Límite de crédito excedido }
+              schema: { $ref: '#/components/schemas/CreditMovement' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/UnprocessableEntity' }
+
   /credits/{id}/balance:
     get:
-      tags: [ Credits ]
-      summary: Get credit balances and available amount
-      description: >
-        Consulta el saldo de un crédito: límite, balance utilizado y disponible.
+      tags: [Credits]
+      summary: Obtener saldos y disponible
+      description: Consulta el saldo de un crédito como el límite, balance utilizado y disponible.
       operationId: getBalance
       parameters:
-        - name: id
-          in: path
+        - in: path
+          name: id
           required: true
           schema: { type: string }
-          description: Identificador del crédito
       responses:
         '200':
           description: OK
           content:
             application/json:
+              schema: { $ref: '#/components/schemas/CreditBalance' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /credits/{id}/movements:
+    get:
+      tags: [Credits]
+      summary: Listar movimientos de un crédito
+      description: >
+        Devuelve los movimientos del crédito
+      operationId: listCreditMovements
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+        - in: query
+          name: type
+          schema:
+            type: string
+            enum: [CHARGE, PAYMENT, INTEREST, FEE, REVERSAL]
+          description: Filtrar por tipo de movimiento.
+      responses:
+        '200':
+          description: Lista de movimientos
+          content:
+            application/json:
               schema:
-                $ref: '#/components/schemas/CreditBalance'
-        '404': { description: Crédito no encontrado }
+                type: array
+                items: { $ref: '#/components/schemas/CreditMovement' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /credits/{customerId}/debt-status:
+    get:
+      tags: [ Credits ]
+      summary: Estado de deuda del cliente
+      description: Devuelve un resumen consolidado de deuda del cliente.
+      operationId: getDebtStatusByCustomer
+      parameters:
+        - in: path
+          name: customerId
+          required: true
+          schema: { type: string }
+          description: Identificador del cliente.
+      responses:
+        '200':
+          description: Resumen de deuda del cliente
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/OverdueStatus' }
+        '404': { $ref: '#/components/responses/NotFound' }
 
 components:
+  responses:
+    BadRequest:
+      description: Error de validación o solicitud inválida.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    NotFound:
+      description: Recurso no encontrado.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    Conflict:
+      description: Conflicto con reglas de negocio o estado del recurso.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    UnprocessableEntity:
+      description: Solicitud válida pero con errores semánticos (p. ej., límite excedido).
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    ServiceUnavailable:
+      description: Servicio dependiente no disponible (p. ej., customer-service).
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+
   schemas:
     CreditType:
       type: string
-      description: Tipo de crédito
+      description: Tipo de crédito.
       enum: [PERSONAL, BUSINESS, CREDIT_CARD]
 
     CreditStatus:
       type: string
-      description: Estado del crédito
-      enum: [ACTIVE, INACTIVE]
+      description: Estado del crédito.
+      enum: [ACTIVE, CLOSED, DELINQUENT]
+
+    DocumentType:
+      type: string
+      enum: [ DNI, RUC, CE ]
 
     Card:
       type: object
-      description: Información de la tarjeta asociada al crédito (opcional).
+      description: Información de la tarjeta asociada (solo para `CREDIT_CARD`).
       properties:
         id:
           type: string
-          description: Identificador único de la tarjeta
+          description: Identificador único/token de la tarjeta.
         last4:
           type: string
           pattern: '^[0-9]{4}$'
-          description: Últimos 4 dígitos
+          description: Últimos 4 dígitos de la tarjeta.
         brand:
           type: string
           example: VISA
-          description: Marca de la tarjeta
+          description: Marca de la tarjeta.
 
     Credit:
       type: object
-      description: Representa un crédito registrado en el sistema.
-      required:
-        - id
-        - customerId
-        - type
-        - limit
-        - balance
-        - interestAnnual
-        - status
-        - createdAt
+      description: Crédito registrado en el sistema.
+      required: [id, customerId, type, limit, balance, interestAnnual, status, createdAt]
       properties:
         id:
           type: string
-          description: Identificador del crédito (ObjectId/UUID)
+          description: Identificador del crédito (ObjectId/UUID).
+          readOnly: true
         customerId:
           type: string
-          description: Id del cliente (personal o empresarial)
+          description: ID del cliente (personal o empresarial).
+          readOnly: true
+        type:
+          $ref: '#/components/schemas/CreditType'
+          readOnly: true
+        limit:
+          type: number
+          minimum: 0
+          description: Límite máximo del crédito (en préstamos equivale al monto otorgado).
+        balance:
+          type: number
+          minimum: 0
+          description: Deuda actual del crédito.
+          readOnly: true
+        interestAnnual:
+          type: number
+          minimum: 0
+          description: Tasa de interés anual (%).
+        dueDate:
+          type: string
+          format: date
+          description: Fecha de pago del crédito.
+        status:
+          $ref: '#/components/schemas/CreditStatus'
+          readOnly: true
+        card:
+          $ref: '#/components/schemas/Card'
+        closedAt:
+          type: string
+          format: date-time
+          description: Fecha/hora de cierre (borrado lógico).
+          readOnly: true
+        closeReason:
+          type: string
+          description: Motivo del cierre.
+          readOnly: true
+        createdAt:
+          type: string
+          format: date-time
+          description: Fecha de creación del crédito.
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          description: Última fecha de actualización.
+          readOnly: true
+        currency:
+          type: string
+          description: Moneda ISO 4217 (p. ej., PEN, USD).
+          example: PEN
+
+    CreditCreate:
+      type: object
+      description: Datos requeridos para registrar un nuevo crédito según reglas de negocio.
+      additionalProperties: false
+      properties:
+        customerId:
+          type: string
+          description: Identificador interno del cliente (si se envía, no enviar documento).
+        documentType:
+          $ref: '#/components/schemas/DocumentType'
+        documentNumber:
+          type: string
+          description: Número de documento .
         type:
           $ref: '#/components/schemas/CreditType'
         limit:
           type: number
-          format: double
           minimum: 0
-          example: 5000
-          description: Límite máximo aprobado para el crédito
-        balance:
-          type: number
-          format: double
-          minimum: 0
-          example: 200
-          description: Saldo actualmente utilizado.
+          description: Límite aprobado (obligatorio para `CREDIT_CARD`).
         interestAnnual:
           type: number
-          format: double
           minimum: 0
-          description: Porcentaje de interés anual aplicado al crédito
-          example: 110
+          description: Tasa de interés anual (%).
         dueDate:
           type: string
           format: date
-          description: Fecha de pago
-          example: '2025-09-05'
-        status:
-          $ref: '#/components/schemas/CreditStatus'
+          description: Fecha de pago del crédito.
+        currency:
+          type: string
+          description: Moneda ISO 4217 (p. ej., PEN, USD).
+          example: PEN
+          default: PEN
         card:
           $ref: '#/components/schemas/Card'
-        createdAt:
-          type: string
-          format: date-time
-          description: Fecha de creación del crédito
-        updatedAt:
-          type: string
-          format: date-time
-          description: Última fecha de actualización
+      required: [ type, limit, interestAnnual ]
+      oneOf:
+          - required: [ customerId ]
+          - required: [ documentType, documentNumber ]
 
-    CreditRequest:
+    CreditUpdate:
       type: object
-      description: Datos requeridos para registrar un nuevo crédito según las reglas de negocio
-      required:
-        - customerId
-        - type
-        - limit
-        - interestAnnual
+      description: Campos permitidos para actualización .
+      additionalProperties: false
       properties:
-        customerId: { type: string }
-        type: { $ref: '#/components/schemas/CreditType' }
-        limit:
-          type: number
-          format: double
-          minimum: 0
         interestAnnual:
           type: number
-          format: double
           minimum: 0
+          description: Tasa de interés anual (%).
         dueDate:
           type: string
           format: date
+          description: Fecha de pago del crédito.
         card:
           $ref: '#/components/schemas/Card'
 
-    CreditUpdateRequest:
-      allOf:
-        - $ref: '#/components/schemas/Credit'
-      description: Objeto para actualizar un crédito existente (reemplazo total).
+    CreditCloseRequest:
+      type: object
+      description: Datos opcionales para el cierre (borrado lógico) del crédito.
+      additionalProperties: false
+      properties:
+        reason:
+          type: string
+          description: Motivo del cierre (ej. USER_REQUEST, ADMIN, FRAUD_SUSPECT).
 
     CreditPaymentRequest:
       type: object
-      description: Datos necesarios para aplicar un pago a un crédito.
-      required: [ amount ]
+      description: Datos necesarios para aplicar un pago (incluye pago de terceros).
+      required: [amount]
+      additionalProperties: false
       properties:
+        payerCustomerId:
+          type: string
+          description: Identificador del pagador. Si se omite, se asume el dueño del crédito.
         amount:
           type: number
-          format: double
           minimum: 0.01
+          description: Monto del pago.
+        channel:
+          type: string
+          enum: [CASH, TRANSFER, CARD]
+          description: Canal del pago.
         note:
           type: string
           maxLength: 200
+          description: Observación opcional.
 
     CreditChargeRequest:
       type: object
-      description: Datos necesarios para aplicar un cargo (compra/consumo).
-      required: [ amount ]
+      description: Datos necesarios para aplicar un cargo (consumo).
+      required: [amount]
+      additionalProperties: false
       properties:
         amount:
           type: number
-          format: double
           minimum: 0.01
+          description: Monto del consumo/cargo.
         merchant:
           type: string
           maxLength: 120
+          description: Comercio o detalle del consumo.
+        channel:
+          type: string
+          description: Canal del consumo. Por defecto "CARD" para tarjetas de crédito.
+          default: CARD
         note:
           type: string
           maxLength: 200
+          description: Observación opcional.
 
     CreditBalance:
       type: object
-      description: Representa los saldos de un crédito
-      required: [ limit, balance, available ]
+      description: Saldos del crédito.
+      required: [limit, balance, available]
+      additionalProperties: false
       properties:
         limit:
           type: number
-          format: double
           minimum: 0
-          description: Límite máximo del crédito
+          description: Límite máximo del crédito.
         balance:
           type: number
-          format: double
           minimum: 0
-          description: Saldo utilizado/deuda
+          description: Saldo utilizado/deuda.
         available:
           type: number
-          format: double
-          description: Saldo disponible (limit - balance)
+          description: Saldo disponible (limit - balance).
+
+    CreditMovement:
+      type: object
+      description: Movimiento (cargo, pago, interés, comisión o reverso).
+      required: [id, creditId, type, amount, txnAt]
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          description: Identificador del movimiento.
+        creditId:
+          type: string
+          description: Identificador del crédito al que pertenece.
+        type:
+          type: string
+          enum: [CHARGE, PAYMENT, INTEREST, FEE, REVERSAL]
+          description: Tipo de movimiento.
+        amount:
+          type: number
+          description: Monto del movimiento.
+        txnAt:
+          type: string
+          format: date-time
+          description: Fecha/hora del evento.
+        postedAt:
+          type: string
+          format: date-time
+          description: Fecha/hora contable (posteo).
+        runningBalance:
+          type: number
+          description: Saldo resultante luego del movimiento.
+        channel:
+          type: string
+          description: Canal por el que se registró el movimiento.
+
+    OverdueStatus:
+      type: object
+      required: [ hasOverdue, totalOverdueAmount ]
+      properties:
+        hasOverdue:
+          type: boolean
+          description: Indica si el cliente tiene al menos un crédito en mora (DELINQUENT).
+        totalOverdueAmount:
+          type: number
+          description: Suma de los saldos (balance) de todos los créditos en estado DELINQUENT.
+
+    Error:
+      type: object
+      description: Estructura de error basada en RFC 7807 (Problem Details).
+      additionalProperties: false
+      properties:
+        type: { type: string, example: 'https://errors.bank.com/business-rule' }
+        title: { type: string, example: 'Regla de negocio violada' }
+        status: { type: integer, example: 409 }
+        detail: { type: string, example: 'El cliente ya posee un crédito PERSONAL activo.' }
+        instance: { type: string, example: '/credits/12345' }
+        code: { $ref: '#/components/schemas/ErrorCode' }
+        errors:
+          type: array
+          items: { $ref: '#/components/schemas/FieldError' }
+
+    FieldError:
+      type: object
+      description: Error de validación por campo.
+      additionalProperties: false
+      properties:
+        field: { type: string, example: 'interestAnnual' }
+        message: { type: string, example: 'Debe ser mayor o igual a 0' }
+        code: { type: string, example: 'Min' }
+
+    ErrorCode:
+      type: string
+      description: Código interno de negocio.
+      enum:
+        - CREDIT_PERSONAL_LIMIT
+        - CREDIT_DELINQUENT_LOCK
+        - CREDIT_CARD_LIMIT_EXCEEDED
+        - CREDIT_INVALID_STATE
+        - CREDIT_NOT_FOUND
+        - CUSTOMER_NOT_FOUND
+        - VALIDATION_ERROR
+        - SERVICE_UNAVAILABLE
