@@ -1,26 +1,35 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <configuration scan="true">
 
-    <!-- Variables -->
-    <property name="APP_NAME" value="${spring.application.name:-credit-service}"/>
+    <!-- Propiedades-->
+    <property name="LOG_PATH" value="./logs"/>
+    <property name="APP_NAME" value="customers-service"/>
 
-    <!--Define que los logs se imprimen en la consola -->
+    <!-- Formato de log en consola -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{yyyy-MM-dd'T'HH:mm:ss.SSSZ} %-5level [%thread] %logger{36} - %msg | corrId=%X{corrId} | reqId=%X{reqId}%n</pattern>
-            <immediateFlush>true</immediateFlush>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
 
-    <!-- Configuración raíz -->
+    <!-- Guardar logs en archivo -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/${APP_NAME}.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- Archivo nuevo cada día -->
+            <fileNamePattern>${LOG_PATH}/${APP_NAME}.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>7</maxHistory> <!-- Maximo de días guardado (7)-->
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level [%thread] %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
     <root level="INFO">
         <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
     </root>
 
-    <!-- Ajustes de nivel de log por paquetes específicos -->
     <logger name="org.springframework" level="WARN"/>
-    <logger name="org.mongodb.driver" level="WARN"/>
-    <logger name="reactor.netty" level="WARN"/>
-    <logger name="com.nttdata.credit_service" level="DEBUG"/>
+    <logger name="org.mongodb.driver" level="INFO"/>
 
 </configuration>
