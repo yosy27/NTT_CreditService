@@ -8,7 +8,7 @@ info:
     consultar saldos, listar movimientos y consultar créditos por cliente o documento.
 
 servers:
-  - url: http://localhost:8585/
+  - url: http://localhost:8585
 
 tags:
   - name: Credits
@@ -31,13 +31,13 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/CreditCreate' }
+            schema: { $ref: '#/components/schemas/CreditRequest' }
       responses:
         '201':
           description: Crédito creado exitosamente
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/Credit' }
+              schema: { $ref: '#/components/schemas/CreditResponse' }
         '400': { $ref: '#/components/responses/BadRequest' }
         '409': { $ref: '#/components/responses/Conflict' }
         '422': { $ref: '#/components/responses/UnprocessableEntity' }
@@ -72,7 +72,7 @@ paths:
             application/json:
               schema:
                 type: array
-                items: { $ref: '#/components/schemas/Credit' }
+                items: { $ref: '#/components/schemas/CreditResponse' }
 
   /customers/{customerId}/credits:
     get:
@@ -101,7 +101,7 @@ paths:
             application/json:
               schema:
                 type: array
-                items: { $ref: '#/components/schemas/Credit' }
+                items: { $ref: '#/components/schemas/CreditResponse' }
         '404': { $ref: '#/components/responses/NotFound' }
 
   /credits/search:
@@ -128,7 +128,7 @@ paths:
             application/json:
               schema:
                 type: array
-                items: { $ref: '#/components/schemas/Credit' }
+                items: { $ref: '#/components/schemas/CreditResponse' }
         '404': { $ref: '#/components/responses/NotFound' }
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
 
@@ -148,7 +148,7 @@ paths:
           description: Crédito encontrado
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/Credit' }
+              schema: { $ref: '#/components/schemas/CreditResponse' }
         '404': { $ref: '#/components/responses/NotFound' }
     patch:
       tags: [Credits]
@@ -167,7 +167,37 @@ paths:
           description: Crédito actualizado
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/Credit' }
+              schema: { $ref: '#/components/schemas/CreditResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+    delete:
+      tags: [ Credits ]
+      summary: Eliminar crédito
+      description: >
+        Eliminar crédito
+      operationId: deleteCredit
+      responses:
+        '204':
+          description: Eliminado (sin cuerpo)
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+    put:
+      tags: [ Credits ]
+      summary: Reemplazo completo de campos editables
+      description: Reemplaza los campos del crédito.
+      operationId: updateCredit
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreditRequest' }
+      responses:
+        '200':
+          description: Crédito actualizado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CreditResponse' }
         '400': { $ref: '#/components/responses/BadRequest' }
         '404': { $ref: '#/components/responses/NotFound' }
         '409': { $ref: '#/components/responses/Conflict' }
@@ -183,7 +213,7 @@ paths:
       tags: [Credits]
       summary: Cerrar crédito (borrado lógico)
       description: >
-        Cierra el crédito realizando borrado lógico (status=CLOSED y `closedAt`).
+        Cierra el crédito realizando borrado lógico.
         Requiere `balance = 0`. No elimina físicamente el documento.
       operationId: closeCredit
       requestBody:
@@ -196,7 +226,7 @@ paths:
           description: Crédito cerrado
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/Credit' }
+              schema: { $ref: '#/components/schemas/CreditResponse' }
         '404': { $ref: '#/components/responses/NotFound' }
         '409': { $ref: '#/components/responses/Conflict' }
 
@@ -235,7 +265,7 @@ paths:
           description: Límite actualizado
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/Credit' }
+              schema: { $ref: '#/components/schemas/CreditResponse' }
         '400': { $ref: '#/components/responses/BadRequest' }
         '404': { $ref: '#/components/responses/NotFound' }
         '409':
@@ -432,7 +462,7 @@ components:
           example: VISA
           description: Marca de la tarjeta.
 
-    Credit:
+    CreditResponse:
       type: object
       description: Crédito registrado en el sistema.
       required: [id, customerId, type, limit, balance, interestAnnual, status, createdAt]
@@ -494,9 +524,9 @@ components:
           description: Moneda ISO 4217 (p. ej., PEN, USD).
           example: PEN
 
-    CreditCreate:
+    CreditRequest:
       type: object
-      description: Datos requeridos para registrar un nuevo crédito según reglas de negocio.
+      description: Datos de crédito
       additionalProperties: false
       properties:
         customerId:
