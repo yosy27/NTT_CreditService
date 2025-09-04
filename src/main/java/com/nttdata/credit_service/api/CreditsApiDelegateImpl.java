@@ -31,7 +31,7 @@ public class CreditsApiDelegateImpl  implements CreditsApiDelegate {
     }
 
     @Override
-    public Mono<ResponseEntity<Credit>> adjustLimit(String id, Mono<InlineObject> inlineObject, ServerWebExchange exchange) {
+    public Mono<ResponseEntity<CreditResponse>> adjustLimit(String id, Mono<InlineObject> inlineObject, ServerWebExchange exchange) {
         return inlineObject
                 .flatMap(body -> service.adjustLimit(id, body.getNewLimit(), body.getReason()))
                 .map(ResponseEntity::ok);    }
@@ -63,7 +63,7 @@ public class CreditsApiDelegateImpl  implements CreditsApiDelegate {
     }
 
     @Override
-    public Mono<ResponseEntity<Credit>> closeCredit(String id, Mono<CreditCloseRequest> creditCloseRequest, ServerWebExchange exchange) {
+    public Mono<ResponseEntity<CreditResponse>> closeCredit(String id, Mono<CreditCloseRequest> creditCloseRequest, ServerWebExchange exchange) {
         return creditCloseRequest
                 .defaultIfEmpty(new CreditCloseRequest())
                 .flatMap(body -> service.closeCredit(id, body.getReason()))
@@ -76,7 +76,7 @@ public class CreditsApiDelegateImpl  implements CreditsApiDelegate {
     }
 
     @Override
-    public Mono<ResponseEntity<Credit>> getCredit(String id, ServerWebExchange exchange) {
+    public Mono<ResponseEntity<CreditResponse>> getCredit(String id, ServerWebExchange exchange) {
         return service.getCredit(id)
                 .map(ResponseEntity::ok);
     }
@@ -89,19 +89,34 @@ public class CreditsApiDelegateImpl  implements CreditsApiDelegate {
     }
 
     @Override
-    public Mono<ResponseEntity<Flux<Credit>>> listCredits(String customerId, CreditType type, CreditStatus status, Boolean includeClosed, ServerWebExchange exchange) {
-        Flux<Credit> stream = service.listCredits(customerId, type, status, includeClosed);
+    public Mono<ResponseEntity<Flux<CreditResponse>>> listCredits(String customerId, CreditType type, CreditStatus status, Boolean includeClosed, ServerWebExchange exchange) {
+        Flux<CreditResponse> stream = service.listCredits(customerId, type, status, includeClosed);
         return Mono.just(ResponseEntity.ok(stream));    }
 
     @Override
-    public Mono<ResponseEntity<Credit>> patchCredit(String id, Mono<CreditUpdate> creditUpdate, ServerWebExchange exchange) {
+    public Mono<ResponseEntity<Void>> deleteCredit(String id, ServerWebExchange exchange) {
+        return service.deleteCredit(id)
+                .thenReturn(ResponseEntity.noContent().build());
+    }
+
+    @Override
+    public Mono<ResponseEntity<CreditResponse>> updateCredit(String id, Mono<CreditRequest> creditRequest, ServerWebExchange exchange) {
+        return creditRequest
+                .switchIfEmpty(Mono.error(new org.springframework.web.server.ResponseStatusException(
+                        org.springframework.http.HttpStatus.BAD_REQUEST, "body is required")))
+                .flatMap(req -> service.updateCredit(id, req))
+                .map(ResponseEntity::ok);
+    }
+
+    @Override
+    public Mono<ResponseEntity<CreditResponse>> patchCredit(String id, Mono<CreditUpdate> creditUpdate, ServerWebExchange exchange) {
         return creditUpdate
                 .flatMap(patch -> service.patchCredit(id, patch))
                 .map(ResponseEntity::ok);
     }
 
     @Override
-    public Mono<ResponseEntity<Credit>> registerCredit(Mono<CreditCreate> creditCreate, ServerWebExchange exchange) {
+    public Mono<ResponseEntity<CreditResponse>> registerCredit(Mono<CreditRequest> creditCreate, ServerWebExchange exchange) {
         return creditCreate
                 .flatMap(service::registerCredit)
                 .map(created -> ResponseEntity
@@ -111,9 +126,9 @@ public class CreditsApiDelegateImpl  implements CreditsApiDelegate {
     }
 
     @Override
-    public Mono<ResponseEntity<Flux<Credit>>> searchCreditsByDocument(DocumentType documentType, String documentNumber, ServerWebExchange exchange) {
+    public Mono<ResponseEntity<Flux<CreditResponse>>> searchCreditsByDocument(DocumentType documentType, String documentNumber, ServerWebExchange exchange) {
         String typeStr = (documentType != null) ? documentType.getValue() : null;
-        Flux<Credit> stream = service.searchByDocument(typeStr, documentNumber);
+        Flux<CreditResponse> stream = service.searchByDocument(typeStr, documentNumber);
         return Mono.just(ResponseEntity.ok(stream));
     }
 
