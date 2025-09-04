@@ -5,94 +5,83 @@ import com.nttdata.credit_service.model.CreditDocument;
 import com.nttdata.credit_service.model.CreditMovementDocument;
 import org.springframework.stereotype.Component;
 
-import javax.swing.plaf.nimbus.State;
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
 
+import static com.nttdata.credit_service.model.util.CreditUtils.parseEnum;
+import static com.nttdata.credit_service.service.mapper.util.MapperUtils.*;
 
 
 //Utilidad de mapeo entre los modelos de la API
 // y el documento de persistencia en MongoDB
-@Component
 public final class CreditMapper {
-
-    private static final ZoneId UTC = ZoneOffset.UTC;
 
     private CreditMapper() {}
 
-    /* ============ 1) CreditDocument -> Credit (API) ============ */
-    public static Credit toApi(CreditDocument d) {
+    /* =================== 1) CreditDocument -> CreditResponse =================== */
+    public static CreditResponse toApi(CreditDocument d) {
         if (d == null) return null;
-        Credit api = new Credit();
+
+        CreditResponse api = new CreditResponse();
         api.setId(d.getId());
         api.setCustomerId(d.getCustomerId());
-        api.setType(safeEnum(CreditType.class, d.getType()));                   // String -> enum
-        api.setLimit(nvl(d.getLimit(), BigDecimal.ZERO));
-        api.setBalance(nvl(d.getBalance(), BigDecimal.ZERO));
-        api.setInterestAnnual(nvl(d.getInterestAnnual(), BigDecimal.ZERO));
+        api.setType(parseEnum(CreditType.class, d.getType()));
+        api.setLimit(orZero(d.getLimit()));
+        api.setBalance(orZero(d.getBalance()));
+        api.setInterestAnnual(orZero(d.getInterestAnnual()));
         api.setDueDate(d.getDueDate());
-        api.setStatus(safeEnum(CreditStatus.class, d.getStatus()));             // String -> enum
-        api.setCurrency(nvlStr(d.getCurrency(), "PEN"));
+        api.setStatus(parseEnum(CreditStatus.class, d.getStatus()));
+        api.setCurrency(orDefault(d.getCurrency(), "PEN"));
         api.setCreatedAt(toOdt(d.getCreatedAt()));
         api.setUpdatedAt(toOdt(d.getUpdatedAt()));
         api.setClosedAt(toOdt(d.getClosedAt()));
-        api.setCloseReason(trimToNull(d.getCloseReason()));
+        api.setCloseReason(normalize(d.getCloseReason()));
 
-        if (d.getCardId() != null || d.getCardLast4() != null || d.getCardBrand() != null) {
-            Card card = new Card();
-            card.setId(trimToNull(d.getCardId()));
-            card.setLast4(trimToNull(d.getCardLast4()));
-            card.setBrand(trimToNull(d.getCardBrand()));
-            api.setCard(card);
-        }
+        if (hasCard(d)) api.setCard(toApiCard(d));
         return api;
     }
 
-    /* ============ 2) CreditCreate (+customerId) -> CreditDocument ============ */
-    public static CreditDocument fromCreate(CreditCreate req, String customerId) {
+    /* =================== 2) CreditRequest (+customerId) -> CreditDocument =================== */
+    public static CreditDocument fromCreate(CreditRequest req, String customerId) {
         if (req == null) return null;
-        CreditDocument e = new CreditDocument();
-        e.setCustomerId(customerId);                                            // ¡ya resuelto!
-        e.setType(asString(req.getType()));                                     // enum -> String
-        e.setLimit(nvl(req.getLimit(), BigDecimal.ZERO));
-        e.setBalance(BigDecimal.ZERO);                                          // saldo inicial
-        e.setInterestAnnual(nvl(req.getInterestAnnual(), BigDecimal.ZERO));
-        e.setDueDate(req.getDueDate());
-        e.setStatus(asString(CreditStatus.ACTIVE));                              // estado inicial
-        e.setCurrency(nvlStr(req.getCurrency(), "PEN"));
+
         Instant now = Instant.now();
+
+        CreditDocument e = new CreditDocument();
+        e.setCustomerId(customerId);
+        e.setType(asString(req.getType()));
+        e.setLimit(orZero(req.getLimit()));
+        e.setBalance(BigDecimal.ZERO);
+        e.setInterestAnnual(orZero(req.getInterestAnnual()));
+        e.setDueDate(req.getDueDate());
+        e.setStatus(asString(CreditStatus.ACTIVE));
+        e.setCurrency(orDefault(req.getCurrency(), "PEN"));
         e.setCreatedAt(now);
         e.setUpdatedAt(now);
 
-        if (req.getCard() != null) {
-            e.setCardId(trimToNull(req.getCard().getId()));
-            e.setCardLast4(trimToNull(req.getCard().getLast4()));
-            e.setCardBrand(trimToNull(req.getCard().getBrand()));
-        }
+        applyCardFromApi(e, req.getCard());
         return e;
     }
 
-    /* ============ 3) merge PATCH: (doc + update) -> doc ============ */
-    public static void merge(CreditDocument target, CreditUpdate patch) {
-        if (target == null || patch == null) return;
+    /* =================== 3) PATCH merge: (doc + update) -> doc =================== */
+    public static CreditDocument merge(CreditDocument target, CreditUpdate patch) {
+        if (target == null || patch == null) return target;
+
         if (patch.getInterestAnnual() != null) target.setInterestAnnual(patch.getInterestAnnual());
-        if (patch.getDueDate() != null) target.setDueDate(patch.getDueDate());
-        if (patch.getCard() != null) {
-            if (patch.getCard().getId() != null) target.setCardId(trimToNull(patch.getCard().getId()));
-            if (patch.getCard().getLast4() != null) target.setCardLast4(trimToNull(patch.getCard().getLast4()));
-            if (patch.getCard().getBrand() != null) target.setCardBrand(trimToNull(patch.getCard().getBrand()));
-        }
-        target.setUpdatedAt(Instant.now());
+        if (patch.getDueDate() != null)        target.setDueDate(patch.getDueDate());
+        if (patch.getCard() != null)           applyCardFromApi(target, patch.getCard());
+
+        touchUpdated(target);
+        return target;
     }
 
-    /* ============ 4) CreditDocument -> CreditBalance (API) ============ */
+    /* =================== 4) CreditDocument -> CreditBalance =================== */
     public static CreditBalance toApiBalance(CreditDocument d) {
         if (d == null) return null;
-        BigDecimal limit = nvl(d.getLimit(), BigDecimal.ZERO);
-        BigDecimal bal = nvl(d.getBalance(), BigDecimal.ZERO);
+
+        BigDecimal limit = orZero(d.getLimit());
+        BigDecimal bal   = orZero(d.getBalance());
+
         CreditBalance b = new CreditBalance();
         b.setLimit(limit);
         b.setBalance(bal);
@@ -100,48 +89,35 @@ public final class CreditMapper {
         return b;
     }
 
-    /* ============ 5) CreditMovementDocument -> CreditMovement (API) ============ */
+    /* =================== 5) CreditMovementDocument -> CreditMovement =================== */
     public static CreditMovement toApi(CreditMovementDocument m) {
         if (m == null) return null;
+
         CreditMovement api = new CreditMovement();
         api.setId(m.getId());
         api.setCreditId(m.getCreditId());
-        // En tus modelos generados, Movement type suele ser inner enum:
-        // enum: [CHARGE, PAYMENT, INTEREST, FEE, REVERSAL]
-        api.setType(safeEnum(CreditMovement.TypeEnum.class, m.getType()));      // String -> enum
-        api.setAmount(nvl(m.getAmount(), BigDecimal.ZERO));
+        api.setType(parseEnum(CreditMovement.TypeEnum.class, m.getType()));
+        api.setAmount(orZero(m.getAmount()));
         api.setTxnAt(toOdt(m.getTxnAt()));
         api.setPostedAt(toOdt(m.getPostedAt()));
-        api.setRunningBalance(nvl(m.getRunningBalance(), BigDecimal.ZERO));
-        api.setChannel(trimToNull(m.getChannel()));
+        api.setRunningBalance(orZero(m.getRunningBalance()));
+        api.setChannel(normalize(m.getChannel()));
         return api;
     }
 
-    /* ======================= helpers ======================= */
+    /* =================== 6) mergeAll: (doc + request completo) -> doc =================== */
+    public static CreditDocument mergeAll(CreditDocument target, CreditRequest src) {
+        if (target == null || src == null) return target;
 
-    private static BigDecimal nvl(BigDecimal v, BigDecimal def) { return v == null ? def : v; }
+        if (src.getType() != null)           target.setType(asString(src.getType()));
+        if (src.getLimit() != null)          target.setLimit(src.getLimit());
+        if (src.getInterestAnnual() != null) target.setInterestAnnual(src.getInterestAnnual());
+        if (src.getDueDate() != null)        target.setDueDate(src.getDueDate());
+        if (src.getCurrency() != null)       target.setCurrency(orDefault(src.getCurrency(), target.getCurrency()));
 
-    private static String trimToNull(String v) {
-        if (v == null) return null;
-        String t = v.trim();
-        return t.isEmpty() ? null : t;
+        applyCardFromApi(target, src.getCard());
+        touchUpdated(target);
+        return target;
     }
 
-    private static String nvlStr(String v, String def) {
-        String t = trimToNull(v);
-        return t == null ? def : t;
-    }
-
-    private static OffsetDateTime toOdt(Instant i) {
-        return i == null ? null : OffsetDateTime.ofInstant(i, UTC);
-    }
-
-    private static <E extends Enum<E>> E safeEnum(Class<E> type, String value) {
-        if (value == null) return null;
-        try { return Enum.valueOf(type, value); }
-        catch (IllegalArgumentException ex) { return null; }
-    }
-
-    // Si tus modelos generados tienen getValue()/fromValue():
-    private static String asString(Enum<?> e) { return e == null ? null : e.name(); }
 }
