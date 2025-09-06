@@ -383,7 +383,7 @@ paths:
                 items: { $ref: '#/components/schemas/CreditMovement' }
         '404': { $ref: '#/components/responses/NotFound' }
 
-  /credits/{customerId}/debt-status:
+  /credits/overdue/{customerId}:
     get:
       tags: [ Credits ]
       summary: Estado de deuda del cliente
