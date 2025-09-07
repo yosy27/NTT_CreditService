@@ -1,0 +1,388 @@
+2025-09-06 02:05:15 INFO  [background-preinit] o.h.validator.internal.util.Version - HV000001: Hibernate Validator 6.2.5.Final
+2025-09-06 02:05:15 INFO  [main] c.n.c.CreditServiceApplication - Starting CreditServiceApplication using Java 11.0.28 on yosy with PID 30512 (C:\Users\User\Documents\Bootcamp Microservicios\Proyecto Microservicios\credit-service\target\classes started by User in C:\Users\User\Documents\Bootcamp Microservicios\Proyecto Microservicios\credit-service)
+2025-09-06 02:05:15 DEBUG [main] c.n.c.CreditServiceApplication - Running with Spring Boot v2.7.18, Spring v5.3.31
+2025-09-06 02:05:15 INFO  [main] c.n.c.CreditServiceApplication - No active profile set, falling back to 1 default profile: "default"
+2025-09-06 02:05:20 INFO  [main] c.n.c.CreditServiceApplication - Started CreditServiceApplication in 5.73 seconds (JVM running for 6.115)
+2025-09-06 02:27:39 INFO  [reactor-http-nio-3] c.n.c.logging.RequestLoggingFilter - >> POST /credits query=- headers=9
+2025-09-06 02:27:39 ERROR [reactor-http-nio-3] c.n.c.error.GlobalErrorHandler - Unhandled error status=500 corrId=null reqId=null err=org.springframework.web.server.ServerWebInputException: 400 BAD_REQUEST "Failed to read HTTP message"; nested exception is org.springframework.core.codec.DecodingException: JSON decoding error: Unexpected character ('}' (code 125)): was expecting double-quote to start field name; nested exception is com.fasterxml.jackson.core.JsonParseException: Unexpected character ('}' (code 125)): was expecting double-quote to start field name
+ at [Source: (io.netty.buffer.ByteBufInputStream); line: 8, column: 2]
+org.springframework.web.server.ServerWebInputException: 400 BAD_REQUEST "Failed to read HTTP message"; nested exception is org.springframework.core.codec.DecodingException: JSON decoding error: Unexpected character ('}' (code 125)): was expecting double-quote to start field name; nested exception is com.fasterxml.jackson.core.JsonParseException: Unexpected character ('}' (code 125)): was expecting double-quote to start field name
+ at [Source: (io.netty.buffer.ByteBufInputStream); line: 8, column: 2]
+	at org.springframework.web.reactive.result.method.annotation.AbstractMessageReaderArgumentResolver.handleReadError(AbstractMessageReaderArgumentResolver.java:235)
+	Suppressed: reactor.core.publisher.FluxOnAssembly$OnAssemblyException: 
+Error has been observed at the following site(s):
+	*__checkpoint ⇢ Handler com.nttdata.credit.api.CreditsApiController#registerCredit(Mono, ServerWebExchange) [DispatcherHandler]
+Original Stack Trace:
+		at org.springframework.web.reactive.result.method.annotation.AbstractMessageReaderArgumentResolver.handleReadError(AbstractMessageReaderArgumentResolver.java:235)
+		at org.springframework.web.reactive.result.method.annotation.AbstractMessageReaderArgumentResolver.lambda$readBody$3(AbstractMessageReaderArgumentResolver.java:201)
+		at reactor.core.publisher.FluxOnErrorResume$ResumeSubscriber.onError(FluxOnErrorResume.java:94)
+		at reactor.core.publisher.MonoFlatMap$FlatMapMain.onNext(MonoFlatMap.java:129)
+		at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.onNext(FluxContextWrite.java:107)
+		at reactor.core.publisher.FluxMapFuseable$MapFuseableConditionalSubscriber.onNext(FluxMapFuseable.java:299)
+		at reactor.core.publisher.FluxFilterFuseable$FilterFuseableConditionalSubscriber.onNext(FluxFilterFuseable.java:337)
+		at reactor.core.publisher.Operators$MonoSubscriber.complete(Operators.java:1839)
+		at reactor.core.publisher.MonoCollect$CollectSubscriber.onComplete(MonoCollect.java:160)
+		at reactor.core.publisher.FluxMap$MapSubscriber.onComplete(FluxMap.java:144)
+		at reactor.core.publisher.FluxPeek$PeekSubscriber.onComplete(FluxPeek.java:260)
+		at reactor.core.publisher.FluxMap$MapSubscriber.onComplete(FluxMap.java:144)
+		at reactor.netty.channel.FluxReceive.onInboundComplete(FluxReceive.java:415)
+		at reactor.netty.channel.ChannelOperations.onInboundComplete(ChannelOperations.java:439)
+		at reactor.netty.http.server.HttpServerOperations.onInboundNext(HttpServerOperations.java:656)
+		at reactor.netty.channel.ChannelOperationsHandler.channelRead(ChannelOperationsHandler.java:114)
+		at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:444)
+		at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:420)
+		at io.netty.channel.AbstractChannelHandlerContext.fireChannelRead(AbstractChannelHandlerContext.java:412)
+		at reactor.netty.http.server.HttpTrafficHandler.channelRead(HttpTrafficHandler.java:276)
+		at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:442)
+		at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:420)
+		at io.netty.channel.AbstractChannelHandlerContext.fireChannelRead(AbstractChannelHandlerContext.java:412)
+		at io.netty.channel.CombinedChannelDuplexHandler$DelegatingChannelHandlerContext.fireChannelRead(CombinedChannelDuplexHandler.java:436)
+		at io.netty.handler.codec.ByteToMessageDecoder.fireChannelRead(ByteToMessageDecoder.java:346)
+		at io.netty.handler.codec.ByteToMessageDecoder.channelRead(ByteToMessageDecoder.java:318)
+		at io.netty.channel.CombinedChannelDuplexHandler.channelRead(CombinedChannelDuplexHandler.java:251)
+		at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:442)
+		at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:420)
+		at io.netty.channel.AbstractChannelHandlerContext.fireChannelRead(AbstractChannelHandlerContext.java:412)
+		at io.netty.channel.DefaultChannelPipeline$HeadContext.channelRead(DefaultChannelPipeline.java:1410)
+		at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:440)
+		at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:420)
+		at io.netty.channel.DefaultChannelPipeline.fireChannelRead(DefaultChannelPipeline.java:919)
+		at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:166)
+		at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:788)
+		at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:724)
+		at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:650)
+		at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
+		at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:997)
+		at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
+		at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
+		at java.base/java.lang.Thread.run(Thread.java:829)
+Caused by: org.springframework.core.codec.DecodingException: JSON decoding error: Unexpected character ('}' (code 125)): was expecting double-quote to start field name; nested exception is com.fasterxml.jackson.core.JsonParseException: Unexpected character ('}' (code 125)): was expecting double-quote to start field name
+ at [Source: (io.netty.buffer.ByteBufInputStream); line: 8, column: 2]
+	at org.springframework.http.codec.json.AbstractJackson2Decoder.processException(AbstractJackson2Decoder.java:242)
+	at org.springframework.http.codec.json.AbstractJackson2Decoder.decode(AbstractJackson2Decoder.java:198)
+	at org.springframework.http.codec.json.AbstractJackson2Decoder.lambda$decodeToMono$1(AbstractJackson2Decoder.java:179)
+	at reactor.core.publisher.MonoFlatMap$FlatMapMain.onNext(MonoFlatMap.java:125)
+	at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.onNext(FluxContextWrite.java:107)
+	at reactor.core.publisher.FluxMapFuseable$MapFuseableConditionalSubscriber.onNext(FluxMapFuseable.java:299)
+	at reactor.core.publisher.FluxFilterFuseable$FilterFuseableConditionalSubscriber.onNext(FluxFilterFuseable.java:337)
+	at reactor.core.publisher.Operators$MonoSubscriber.complete(Operators.java:1839)
+	at reactor.core.publisher.MonoCollect$CollectSubscriber.onComplete(MonoCollect.java:160)
+	at reactor.core.publisher.FluxMap$MapSubscriber.onComplete(FluxMap.java:144)
+	at reactor.core.publisher.FluxPeek$PeekSubscriber.onComplete(FluxPeek.java:260)
+	at reactor.core.publisher.FluxMap$MapSubscriber.onComplete(FluxMap.java:144)
+	at reactor.netty.channel.FluxReceive.onInboundComplete(FluxReceive.java:415)
+	at reactor.netty.channel.ChannelOperations.onInboundComplete(ChannelOperations.java:439)
+	at reactor.netty.http.server.HttpServerOperations.onInboundNext(HttpServerOperations.java:656)
+	at reactor.netty.channel.ChannelOperationsHandler.channelRead(ChannelOperationsHandler.java:114)
+	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:444)
+	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:420)
+	at io.netty.channel.AbstractChannelHandlerContext.fireChannelRead(AbstractChannelHandlerContext.java:412)
+	at reactor.netty.http.server.HttpTrafficHandler.channelRead(HttpTrafficHandler.java:276)
+	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:442)
+	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:420)
+	at io.netty.channel.AbstractChannelHandlerContext.fireChannelRead(AbstractChannelHandlerContext.java:412)
+	at io.netty.channel.CombinedChannelDuplexHandler$DelegatingChannelHandlerContext.fireChannelRead(CombinedChannelDuplexHandler.java:436)
+	at io.netty.handler.codec.ByteToMessageDecoder.fireChannelRead(ByteToMessageDecoder.java:346)
+	at io.netty.handler.codec.ByteToMessageDecoder.channelRead(ByteToMessageDecoder.java:318)
+	at io.netty.channel.CombinedChannelDuplexHandler.channelRead(CombinedChannelDuplexHandler.java:251)
+	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:442)
+	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:420)
+	at io.netty.channel.AbstractChannelHandlerContext.fireChannelRead(AbstractChannelHandlerContext.java:412)
+	at io.netty.channel.DefaultChannelPipeline$HeadContext.channelRead(DefaultChannelPipeline.java:1410)
+	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:440)
+	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:420)
+	at io.netty.channel.DefaultChannelPipeline.fireChannelRead(DefaultChannelPipeline.java:919)
+	at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:166)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:788)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:724)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:650)
+	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
+	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:997)
+	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
+	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
+	at java.base/java.lang.Thread.run(Thread.java:829)
+Caused by: com.fasterxml.jackson.core.JsonParseException: Unexpected character ('}' (code 125)): was expecting double-quote to start field name
+ at [Source: (io.netty.buffer.ByteBufInputStream); line: 8, column: 2]
+	at com.fasterxml.jackson.core.JsonParser._constructError(JsonParser.java:2391)
+	at com.fasterxml.jackson.core.base.ParserMinimalBase._reportError(ParserMinimalBase.java:735)
+	at com.fasterxml.jackson.core.base.ParserMinimalBase._reportUnexpectedChar(ParserMinimalBase.java:659)
+	at com.fasterxml.jackson.core.json.UTF8StreamJsonParser._handleOddName(UTF8StreamJsonParser.java:2096)
+	at com.fasterxml.jackson.core.json.UTF8StreamJsonParser._parseName(UTF8StreamJsonParser.java:1746)
+	at com.fasterxml.jackson.core.json.UTF8StreamJsonParser.nextFieldName(UTF8StreamJsonParser.java:1075)
+	at com.fasterxml.jackson.databind.deser.BeanDeserializer.deserializeFromObject(BeanDeserializer.java:399)
+	at com.fasterxml.jackson.databind.deser.BeanDeserializer.deserialize(BeanDeserializer.java:185)
+	at com.fasterxml.jackson.databind.deser.DefaultDeserializationContext.readRootValue(DefaultDeserializationContext.java:323)
+	at com.fasterxml.jackson.databind.ObjectReader._bindAndClose(ObjectReader.java:2051)
+	at com.fasterxml.jackson.databind.ObjectReader.readValue(ObjectReader.java:1427)
+	at org.springframework.http.codec.json.AbstractJackson2Decoder.decode(AbstractJackson2Decoder.java:193)
+	... 41 common frames omitted
+2025-09-06 02:27:39 INFO  [reactor-http-nio-3] c.n.c.logging.RequestLoggingFilter - << POST /credits status=500 took=233ms
+2025-09-06 02:27:45 INFO  [reactor-http-nio-3] c.n.c.logging.RequestLoggingFilter - >> POST /credits query=- headers=9
+2025-09-06 02:27:46 ERROR [nioEventLoopGroup-3-3] c.n.c.error.GlobalErrorHandler - Unhandled error status=500 corrId=null reqId=null err=org.springframework.web.server.ResponseStatusException: 409 CONFLICT "CREDIT_PERSONAL_LIMIT"
+org.springframework.web.server.ResponseStatusException: 409 CONFLICT "CREDIT_PERSONAL_LIMIT"
+	at com.nttdata.credit_service.service.policy.CreditCreationPolicy.lambda$validate$1(CreditCreationPolicy.java:48)
+	Suppressed: reactor.core.publisher.FluxOnAssembly$OnAssemblyException: 
+Error has been observed at the following site(s):
+	*__checkpoint ⇢ Handler com.nttdata.credit.api.CreditsApiController#registerCredit(Mono, ServerWebExchange) [DispatcherHandler]
+Original Stack Trace:
+		at com.nttdata.credit_service.service.policy.CreditCreationPolicy.lambda$validate$1(CreditCreationPolicy.java:48)
+		at reactor.core.publisher.MonoFlatMap$FlatMapMain.onNext(MonoFlatMap.java:125)
+		at reactor.core.publisher.MonoNext$NextSubscriber.onNext(MonoNext.java:82)
+		at reactor.core.publisher.FluxUsingWhen$UsingWhenSubscriber.onNext(FluxUsingWhen.java:345)
+		at reactor.core.publisher.Operators$MonoSubscriber.complete(Operators.java:1839)
+		at reactor.core.publisher.MonoHasElements$HasElementsSubscriber.onNext(MonoHasElements.java:82)
+		at reactor.core.publisher.FluxOnErrorResume$ResumeSubscriber.onNext(FluxOnErrorResume.java:79)
+		at reactor.core.publisher.MonoFlatMapMany$FlatMapManyInner.onNext(MonoFlatMapMany.java:250)
+		at reactor.core.publisher.FluxCreate$BufferAsyncSink.drain(FluxCreate.java:878)
+		at reactor.core.publisher.FluxCreate$BufferAsyncSink.next(FluxCreate.java:803)
+		at reactor.core.publisher.FluxCreate$SerializedFluxSink.next(FluxCreate.java:161)
+		at java.base/java.util.ArrayList.forEach(ArrayList.java:1541)
+		at com.mongodb.reactivestreams.client.internal.BatchCursorFlux.lambda$recurseCursor$4(BatchCursorFlux.java:94)
+		at reactor.core.publisher.MonoPeekTerminal$MonoTerminalPeekSubscriber.onNext(MonoPeekTerminal.java:171)
+		at reactor.core.publisher.MonoPeekTerminal$MonoTerminalPeekSubscriber.onNext(MonoPeekTerminal.java:180)
+		at reactor.core.publisher.FluxPeekFuseable$PeekConditionalSubscriber.onNext(FluxPeekFuseable.java:854)
+		at reactor.core.publisher.MonoCreate$DefaultMonoSink.success(MonoCreate.java:172)
+		at com.mongodb.reactivestreams.client.internal.MongoOperationPublisher.lambda$sinkToCallback$30(MongoOperationPublisher.java:549)
+		at com.mongodb.internal.operation.AsyncQueryBatchCursor.next(AsyncQueryBatchCursor.java:174)
+		at com.mongodb.reactivestreams.client.internal.BatchCursor.lambda$next$0(BatchCursor.java:35)
+		at reactor.core.publisher.MonoCreate.subscribe(MonoCreate.java:58)
+		at reactor.core.publisher.Mono.subscribe(Mono.java:4490)
+		at reactor.core.publisher.Mono.subscribeWith(Mono.java:4605)
+		at reactor.core.publisher.Mono.subscribe(Mono.java:4318)
+		at com.mongodb.reactivestreams.client.internal.BatchCursorFlux.recurseCursor(BatchCursorFlux.java:104)
+		at com.mongodb.reactivestreams.client.internal.BatchCursorFlux.lambda$subscribe$0(BatchCursorFlux.java:56)
+		at reactor.core.publisher.LambdaMonoSubscriber.onNext(LambdaMonoSubscriber.java:171)
+		at reactor.core.publisher.FluxMap$MapSubscriber.onNext(FluxMap.java:122)
+		at reactor.core.publisher.MonoNext$NextSubscriber.onNext(MonoNext.java:82)
+		at reactor.core.publisher.MonoNext$NextSubscriber.onNext(MonoNext.java:82)
+		at reactor.core.publisher.Operators$MonoSubscriber.complete(Operators.java:1839)
+		at reactor.core.publisher.MonoFlatMap$FlatMapInner.onNext(MonoFlatMap.java:249)
+		at reactor.core.publisher.MonoPeekTerminal$MonoTerminalPeekSubscriber.onNext(MonoPeekTerminal.java:180)
+		at reactor.core.publisher.MonoCreate$DefaultMonoSink.success(MonoCreate.java:172)
+		at com.mongodb.reactivestreams.client.internal.MongoOperationPublisher.lambda$sinkToCallback$30(MongoOperationPublisher.java:549)
+		at com.mongodb.reactivestreams.client.internal.OperationExecutorImpl.lambda$execute$2(OperationExecutorImpl.java:92)
+		at com.mongodb.internal.async.ErrorHandlingResultCallback.onResult(ErrorHandlingResultCallback.java:48)
+		at com.mongodb.internal.async.function.AsyncCallbackSupplier.lambda$whenComplete$1(AsyncCallbackSupplier.java:95)
+		at com.mongodb.internal.async.function.RetryingAsyncCallbackSupplier$RetryingCallback.onResult(RetryingAsyncCallbackSupplier.java:114)
+		at com.mongodb.internal.async.ErrorHandlingResultCallback.onResult(ErrorHandlingResultCallback.java:48)
+		at com.mongodb.internal.async.function.AsyncCallbackSupplier.lambda$whenComplete$1(AsyncCallbackSupplier.java:95)
+		at com.mongodb.internal.async.ErrorHandlingResultCallback.onResult(ErrorHandlingResultCallback.java:48)
+		at com.mongodb.internal.async.function.AsyncCallbackSupplier.lambda$whenComplete$1(AsyncCallbackSupplier.java:95)
+		at com.mongodb.internal.operation.FindOperation$2.onResult(FindOperation.java:792)
+		at com.mongodb.internal.operation.CommandOperationHelper.lambda$transformingReadCallback$10(CommandOperationHelper.java:331)
+		at com.mongodb.internal.async.ErrorHandlingResultCallback.onResult(ErrorHandlingResultCallback.java:48)
+		at com.mongodb.internal.connection.DefaultServer$DefaultServerProtocolExecutor$2.onResult(DefaultServer.java:276)
+		at com.mongodb.internal.async.ErrorHandlingResultCallback.onResult(ErrorHandlingResultCallback.java:48)
+		at com.mongodb.internal.connection.CommandProtocolImpl$1.onResult(CommandProtocolImpl.java:84)
+		at com.mongodb.internal.connection.DefaultConnectionPool$PooledConnection$1.onResult(DefaultConnectionPool.java:684)
+		at com.mongodb.internal.connection.UsageTrackingInternalConnection$2.onResult(UsageTrackingInternalConnection.java:159)
+		at com.mongodb.internal.async.ErrorHandlingResultCallback.onResult(ErrorHandlingResultCallback.java:48)
+		at com.mongodb.internal.connection.InternalStreamConnection$2$1.onResult(InternalStreamConnection.java:521)
+		at com.mongodb.internal.connection.InternalStreamConnection$2$1.onResult(InternalStreamConnection.java:498)
+		at com.mongodb.internal.connection.InternalStreamConnection$MessageHeaderCallback$MessageCallback.onResult(InternalStreamConnection.java:821)
+		at com.mongodb.internal.connection.InternalStreamConnection$MessageHeaderCallback$MessageCallback.onResult(InternalStreamConnection.java:785)
+		at com.mongodb.internal.connection.InternalStreamConnection$5.completed(InternalStreamConnection.java:645)
+		at com.mongodb.internal.connection.InternalStreamConnection$5.completed(InternalStreamConnection.java:642)
+		at com.mongodb.connection.netty.NettyStream.readAsync(NettyStream.java:319)
+		at com.mongodb.connection.netty.NettyStream.readAsync(NettyStream.java:266)
+		at com.mongodb.internal.connection.InternalStreamConnection.readAsync(InternalStreamConnection.java:642)
+		at com.mongodb.internal.connection.InternalStreamConnection.access$600(InternalStreamConnection.java:86)
+		at com.mongodb.internal.connection.InternalStreamConnection$MessageHeaderCallback.onResult(InternalStreamConnection.java:775)
+		at com.mongodb.internal.connection.InternalStreamConnection$MessageHeaderCallback.onResult(InternalStreamConnection.java:760)
+		at com.mongodb.internal.connection.InternalStreamConnection$5.completed(InternalStreamConnection.java:645)
+		at com.mongodb.internal.connection.InternalStreamConnection$5.completed(InternalStreamConnection.java:642)
+		at com.mongodb.connection.netty.NettyStream.readAsync(NettyStream.java:319)
+		at com.mongodb.connection.netty.NettyStream.handleReadResponse(NettyStream.java:347)
+		at com.mongodb.connection.netty.NettyStream.access$1100(NettyStream.java:105)
+		at com.mongodb.connection.netty.NettyStream$InboundBufferHandler.channelRead0(NettyStream.java:421)
+		at com.mongodb.connection.netty.NettyStream$InboundBufferHandler.channelRead0(NettyStream.java:418)
+		at io.netty.channel.SimpleChannelInboundHandler.channelRead(SimpleChannelInboundHandler.java:99)
+		at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:444)
+		at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:420)
+		at io.netty.channel.AbstractChannelHandlerContext.fireChannelRead(AbstractChannelHandlerContext.java:412)
+		at io.netty.channel.DefaultChannelPipeline$HeadContext.channelRead(DefaultChannelPipeline.java:1410)
+		at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:440)
+		at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:420)
+		at io.netty.channel.DefaultChannelPipeline.fireChannelRead(DefaultChannelPipeline.java:919)
+		at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:166)
+		at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:788)
+		at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:724)
+		at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:650)
+		at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
+		at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:997)
+		at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
+		at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
+		at java.base/java.lang.Thread.run(Thread.java:829)
+2025-09-06 02:27:46 INFO  [reactor-http-nio-3] c.n.c.logging.RequestLoggingFilter - << POST /credits status=500 took=522ms
+2025-09-06 02:31:56 INFO  [reactor-http-nio-5] c.n.c.logging.RequestLoggingFilter - >> POST /credits query=- headers=9
+2025-09-06 02:31:56 ERROR [reactor-http-nio-5] c.n.c.error.GlobalErrorHandler - Unhandled error status=500 corrId=null reqId=null err=org.springframework.web.server.ServerWebInputException: 400 BAD_REQUEST "Failed to read HTTP message"; nested exception is org.springframework.core.codec.DecodingException: JSON decoding error: Unexpected character ('}' (code 125)): was expecting double-quote to start field name; nested exception is com.fasterxml.jackson.core.JsonParseException: Unexpected character ('}' (code 125)): was expecting double-quote to start field name
+ at [Source: (io.netty.buffer.ByteBufInputStream); line: 8, column: 2]
+org.springframework.web.server.ServerWebInputException: 400 BAD_REQUEST "Failed to read HTTP message"; nested exception is org.springframework.core.codec.DecodingException: JSON decoding error: Unexpected character ('}' (code 125)): was expecting double-quote to start field name; nested exception is com.fasterxml.jackson.core.JsonParseException: Unexpected character ('}' (code 125)): was expecting double-quote to start field name
+ at [Source: (io.netty.buffer.ByteBufInputStream); line: 8, column: 2]
+	at org.springframework.web.reactive.result.method.annotation.AbstractMessageReaderArgumentResolver.handleReadError(AbstractMessageReaderArgumentResolver.java:235)
+	Suppressed: reactor.core.publisher.FluxOnAssembly$OnAssemblyException: 
+Error has been observed at the following site(s):
+	*__checkpoint ⇢ Handler com.nttdata.credit.api.CreditsApiController#registerCredit(Mono, ServerWebExchange) [DispatcherHandler]
+Original Stack Trace:
+		at org.springframework.web.reactive.result.method.annotation.AbstractMessageReaderArgumentResolver.handleReadError(AbstractMessageReaderArgumentResolver.java:235)
+		at org.springframework.web.reactive.result.method.annotation.AbstractMessageReaderArgumentResolver.lambda$readBody$3(AbstractMessageReaderArgumentResolver.java:201)
+		at reactor.core.publisher.FluxOnErrorResume$ResumeSubscriber.onError(FluxOnErrorResume.java:94)
+		at reactor.core.publisher.MonoFlatMap$FlatMapMain.onNext(MonoFlatMap.java:129)
+		at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.onNext(FluxContextWrite.java:107)
+		at reactor.core.publisher.FluxMapFuseable$MapFuseableConditionalSubscriber.onNext(FluxMapFuseable.java:299)
+		at reactor.core.publisher.FluxFilterFuseable$FilterFuseableConditionalSubscriber.onNext(FluxFilterFuseable.java:337)
+		at reactor.core.publisher.Operators$MonoSubscriber.complete(Operators.java:1839)
+		at reactor.core.publisher.MonoCollect$CollectSubscriber.onComplete(MonoCollect.java:160)
+		at reactor.core.publisher.FluxMap$MapSubscriber.onComplete(FluxMap.java:144)
+		at reactor.core.publisher.FluxPeek$PeekSubscriber.onComplete(FluxPeek.java:260)
+		at reactor.core.publisher.FluxMap$MapSubscriber.onComplete(FluxMap.java:144)
+		at reactor.netty.channel.FluxReceive.onInboundComplete(FluxReceive.java:415)
+		at reactor.netty.channel.ChannelOperations.onInboundComplete(ChannelOperations.java:439)
+		at reactor.netty.http.server.HttpServerOperations.onInboundNext(HttpServerOperations.java:656)
+		at reactor.netty.channel.ChannelOperationsHandler.channelRead(ChannelOperationsHandler.java:114)
+		at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:444)
+		at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:420)
+		at io.netty.channel.AbstractChannelHandlerContext.fireChannelRead(AbstractChannelHandlerContext.java:412)
+		at reactor.netty.http.server.HttpTrafficHandler.channelRead(HttpTrafficHandler.java:276)
+		at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:442)
+		at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:420)
+		at io.netty.channel.AbstractChannelHandlerContext.fireChannelRead(AbstractChannelHandlerContext.java:412)
+		at io.netty.channel.CombinedChannelDuplexHandler$DelegatingChannelHandlerContext.fireChannelRead(CombinedChannelDuplexHandler.java:436)
+		at io.netty.handler.codec.ByteToMessageDecoder.fireChannelRead(ByteToMessageDecoder.java:346)
+		at io.netty.handler.codec.ByteToMessageDecoder.channelRead(ByteToMessageDecoder.java:318)
+		at io.netty.channel.CombinedChannelDuplexHandler.channelRead(CombinedChannelDuplexHandler.java:251)
+		at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:442)
+		at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:420)
+		at io.netty.channel.AbstractChannelHandlerContext.fireChannelRead(AbstractChannelHandlerContext.java:412)
+		at io.netty.channel.DefaultChannelPipeline$HeadContext.channelRead(DefaultChannelPipeline.java:1410)
+		at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:440)
+		at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:420)
+		at io.netty.channel.DefaultChannelPipeline.fireChannelRead(DefaultChannelPipeline.java:919)
+		at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:166)
+		at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:788)
+		at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:724)
+		at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:650)
+		at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
+		at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:997)
+		at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
+		at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
+		at java.base/java.lang.Thread.run(Thread.java:829)
+Caused by: org.springframework.core.codec.DecodingException: JSON decoding error: Unexpected character ('}' (code 125)): was expecting double-quote to start field name; nested exception is com.fasterxml.jackson.core.JsonParseException: Unexpected character ('}' (code 125)): was expecting double-quote to start field name
+ at [Source: (io.netty.buffer.ByteBufInputStream); line: 8, column: 2]
+	at org.springframework.http.codec.json.AbstractJackson2Decoder.processException(AbstractJackson2Decoder.java:242)
+	at org.springframework.http.codec.json.AbstractJackson2Decoder.decode(AbstractJackson2Decoder.java:198)
+	at org.springframework.http.codec.json.AbstractJackson2Decoder.lambda$decodeToMono$1(AbstractJackson2Decoder.java:179)
+	at reactor.core.publisher.MonoFlatMap$FlatMapMain.onNext(MonoFlatMap.java:125)
+	at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.onNext(FluxContextWrite.java:107)
+	at reactor.core.publisher.FluxMapFuseable$MapFuseableConditionalSubscriber.onNext(FluxMapFuseable.java:299)
+	at reactor.core.publisher.FluxFilterFuseable$FilterFuseableConditionalSubscriber.onNext(FluxFilterFuseable.java:337)
+	at reactor.core.publisher.Operators$MonoSubscriber.complete(Operators.java:1839)
+	at reactor.core.publisher.MonoCollect$CollectSubscriber.onComplete(MonoCollect.java:160)
+	at reactor.core.publisher.FluxMap$MapSubscriber.onComplete(FluxMap.java:144)
+	at reactor.core.publisher.FluxPeek$PeekSubscriber.onComplete(FluxPeek.java:260)
+	at reactor.core.publisher.FluxMap$MapSubscriber.onComplete(FluxMap.java:144)
+	at reactor.netty.channel.FluxReceive.onInboundComplete(FluxReceive.java:415)
+	at reactor.netty.channel.ChannelOperations.onInboundComplete(ChannelOperations.java:439)
+	at reactor.netty.http.server.HttpServerOperations.onInboundNext(HttpServerOperations.java:656)
+	at reactor.netty.channel.ChannelOperationsHandler.channelRead(ChannelOperationsHandler.java:114)
+	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:444)
+	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:420)
+	at io.netty.channel.AbstractChannelHandlerContext.fireChannelRead(AbstractChannelHandlerContext.java:412)
+	at reactor.netty.http.server.HttpTrafficHandler.channelRead(HttpTrafficHandler.java:276)
+	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:442)
+	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:420)
+	at io.netty.channel.AbstractChannelHandlerContext.fireChannelRead(AbstractChannelHandlerContext.java:412)
+	at io.netty.channel.CombinedChannelDuplexHandler$DelegatingChannelHandlerContext.fireChannelRead(CombinedChannelDuplexHandler.java:436)
+	at io.netty.handler.codec.ByteToMessageDecoder.fireChannelRead(ByteToMessageDecoder.java:346)
+	at io.netty.handler.codec.ByteToMessageDecoder.channelRead(ByteToMessageDecoder.java:318)
+	at io.netty.channel.CombinedChannelDuplexHandler.channelRead(CombinedChannelDuplexHandler.java:251)
+	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:442)
+	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:420)
+	at io.netty.channel.AbstractChannelHandlerContext.fireChannelRead(AbstractChannelHandlerContext.java:412)
+	at io.netty.channel.DefaultChannelPipeline$HeadContext.channelRead(DefaultChannelPipeline.java:1410)
+	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:440)
+	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:420)
+	at io.netty.channel.DefaultChannelPipeline.fireChannelRead(DefaultChannelPipeline.java:919)
+	at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:166)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:788)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:724)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:650)
+	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
+	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:997)
+	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
+	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
+	at java.base/java.lang.Thread.run(Thread.java:829)
+Caused by: com.fasterxml.jackson.core.JsonParseException: Unexpected character ('}' (code 125)): was expecting double-quote to start field name
+ at [Source: (io.netty.buffer.ByteBufInputStream); line: 8, column: 2]
+	at com.fasterxml.jackson.core.JsonParser._constructError(JsonParser.java:2391)
+	at com.fasterxml.jackson.core.base.ParserMinimalBase._reportError(ParserMinimalBase.java:735)
+	at com.fasterxml.jackson.core.base.ParserMinimalBase._reportUnexpectedChar(ParserMinimalBase.java:659)
+	at com.fasterxml.jackson.core.json.UTF8StreamJsonParser._handleOddName(UTF8StreamJsonParser.java:2096)
+	at com.fasterxml.jackson.core.json.UTF8StreamJsonParser._parseName(UTF8StreamJsonParser.java:1746)
+	at com.fasterxml.jackson.core.json.UTF8StreamJsonParser.nextFieldName(UTF8StreamJsonParser.java:1075)
+	at com.fasterxml.jackson.databind.deser.BeanDeserializer.deserializeFromObject(BeanDeserializer.java:399)
+	at com.fasterxml.jackson.databind.deser.BeanDeserializer.deserialize(BeanDeserializer.java:185)
+	at com.fasterxml.jackson.databind.deser.DefaultDeserializationContext.readRootValue(DefaultDeserializationContext.java:323)
+	at com.fasterxml.jackson.databind.ObjectReader._bindAndClose(ObjectReader.java:2051)
+	at com.fasterxml.jackson.databind.ObjectReader.readValue(ObjectReader.java:1427)
+	at org.springframework.http.codec.json.AbstractJackson2Decoder.decode(AbstractJackson2Decoder.java:193)
+	... 41 common frames omitted
+2025-09-06 02:31:56 INFO  [reactor-http-nio-5] c.n.c.logging.RequestLoggingFilter - << POST /credits status=500 took=5ms
+2025-09-06 02:31:59 INFO  [reactor-http-nio-5] c.n.c.logging.RequestLoggingFilter - >> POST /credits query=- headers=9
+2025-09-06 02:31:59 INFO  [reactor-http-nio-5] c.n.c.logging.RequestLoggingFilter - << POST /credits status=201 took=56ms
+2025-09-06 02:56:53 INFO  [reactor-http-nio-7] c.n.c.logging.RequestLoggingFilter - >> GET /credits/68bbe36f31f60e090e9faa54/movements query=type=REVERSAL headers=7
+2025-09-06 02:56:53 INFO  [reactor-http-nio-7] c.n.c.logging.RequestLoggingFilter - << GET /credits/68bbe36f31f60e090e9faa54/movements status=200 took=47ms
+2025-09-06 02:57:06 INFO  [reactor-http-nio-7] c.n.c.logging.RequestLoggingFilter - >> POST /credits/68bbe36f31f60e090e9faa54/charges query=- headers=9
+2025-09-06 02:57:06 INFO  [reactor-http-nio-7] c.n.c.logging.RequestLoggingFilter - << POST /credits/68bbe36f31f60e090e9faa54/charges status=201 took=80ms
+2025-09-06 02:57:09 INFO  [reactor-http-nio-7] c.n.c.logging.RequestLoggingFilter - >> GET /credits/68bbe36f31f60e090e9faa54/movements query=type=REVERSAL headers=7
+2025-09-06 02:57:09 INFO  [reactor-http-nio-7] c.n.c.logging.RequestLoggingFilter - << GET /credits/68bbe36f31f60e090e9faa54/movements status=200 took=5ms
+2025-09-06 02:57:12 INFO  [reactor-http-nio-7] c.n.c.logging.RequestLoggingFilter - >> POST /credits/68bbe36f31f60e090e9faa54/charges query=- headers=9
+2025-09-06 02:57:12 INFO  [reactor-http-nio-7] c.n.c.logging.RequestLoggingFilter - << POST /credits/68bbe36f31f60e090e9faa54/charges status=201 took=9ms
+2025-09-06 02:57:30 INFO  [reactor-http-nio-7] c.n.c.logging.RequestLoggingFilter - >> GET /credits/68bbe36f31f60e090e9faa54/movements query=type= headers=7
+2025-09-06 02:57:30 INFO  [reactor-http-nio-7] c.n.c.logging.RequestLoggingFilter - << GET /credits/68bbe36f31f60e090e9faa54/movements status=200 took=8ms
+2025-09-06 02:57:34 INFO  [reactor-http-nio-7] c.n.c.logging.RequestLoggingFilter - >> GET /credits/68bbe36f31f60e090e9faa54/movements query=type=CHARGE headers=7
+2025-09-06 02:57:34 INFO  [reactor-http-nio-7] c.n.c.logging.RequestLoggingFilter - << GET /credits/68bbe36f31f60e090e9faa54/movements status=200 took=6ms
+2025-09-06 02:58:11 INFO  [reactor-http-nio-7] c.n.c.logging.RequestLoggingFilter - >> GET /credits/68bbe36f31f60e090e9faa54/movements query=type=INTEREST headers=7
+2025-09-06 02:58:11 INFO  [reactor-http-nio-7] c.n.c.logging.RequestLoggingFilter - << GET /credits/68bbe36f31f60e090e9faa54/movements status=200 took=4ms
+2025-09-06 02:58:18 INFO  [reactor-http-nio-7] c.n.c.logging.RequestLoggingFilter - >> GET /credits/68bbe36f31f60e090e9faa54/movements query=type=FEE headers=7
+2025-09-06 02:58:18 INFO  [reactor-http-nio-7] c.n.c.logging.RequestLoggingFilter - << GET /credits/68bbe36f31f60e090e9faa54/movements status=200 took=5ms
+2025-09-06 02:58:22 INFO  [reactor-http-nio-7] c.n.c.logging.RequestLoggingFilter - >> GET /credits/68bbe36f31f60e090e9faa54/movements query=type=REVERSAL headers=7
+2025-09-06 02:58:22 INFO  [reactor-http-nio-7] c.n.c.logging.RequestLoggingFilter - << GET /credits/68bbe36f31f60e090e9faa54/movements status=200 took=4ms
+2025-09-06 02:59:16 INFO  [reactor-http-nio-7] c.n.c.logging.RequestLoggingFilter - >> GET /credits/68bbe36f31f60e090e9faa54/movements query=type= headers=7
+2025-09-06 02:59:16 INFO  [reactor-http-nio-7] c.n.c.logging.RequestLoggingFilter - << GET /credits/68bbe36f31f60e090e9faa54/movements status=200 took=5ms
+2025-09-06 02:59:31 INFO  [reactor-http-nio-7] c.n.c.logging.RequestLoggingFilter - >> POST /credits/68bbe36f31f60e090e9faa54/charges query=- headers=9
+2025-09-06 02:59:31 INFO  [reactor-http-nio-7] c.n.c.logging.RequestLoggingFilter - << POST /credits/68bbe36f31f60e090e9faa54/charges status=201 took=9ms
+2025-09-06 02:59:33 INFO  [reactor-http-nio-7] c.n.c.logging.RequestLoggingFilter - >> POST /credits/68bbe36f31f60e090e9faa54/charges query=- headers=9
+2025-09-06 02:59:33 INFO  [reactor-http-nio-9] c.n.c.logging.RequestLoggingFilter - >> POST /credits/68bbe36f31f60e090e9faa54/charges query=- headers=9
+2025-09-06 02:59:33 INFO  [reactor-http-nio-9] c.n.c.logging.RequestLoggingFilter - << POST /credits/68bbe36f31f60e090e9faa54/charges status=201 took=7ms
+2025-09-06 02:59:33 INFO  [reactor-http-nio-9] c.n.c.logging.RequestLoggingFilter - >> POST /credits/68bbe36f31f60e090e9faa54/charges query=- headers=9
+2025-09-06 02:59:34 INFO  [reactor-http-nio-9] c.n.c.logging.RequestLoggingFilter - << POST /credits/68bbe36f31f60e090e9faa54/charges status=201 took=8ms
+2025-09-06 02:59:34 INFO  [reactor-http-nio-9] c.n.c.logging.RequestLoggingFilter - >> POST /credits/68bbe36f31f60e090e9faa54/charges query=- headers=9
+2025-09-06 02:59:35 INFO  [reactor-http-nio-11] c.n.c.logging.RequestLoggingFilter - >> POST /credits/68bbe36f31f60e090e9faa54/charges query=- headers=9
+2025-09-06 02:59:35 INFO  [reactor-http-nio-11] c.n.c.logging.RequestLoggingFilter - << POST /credits/68bbe36f31f60e090e9faa54/charges status=201 took=8ms
+2025-09-06 02:59:37 INFO  [reactor-http-nio-11] c.n.c.logging.RequestLoggingFilter - >> GET /credits/68bbe36f31f60e090e9faa54/movements query=type= headers=7
+2025-09-06 02:59:37 INFO  [reactor-http-nio-11] c.n.c.logging.RequestLoggingFilter - << GET /credits/68bbe36f31f60e090e9faa54/movements status=200 took=6ms
+2025-09-06 02:59:48 INFO  [reactor-http-nio-11] c.n.c.logging.RequestLoggingFilter - >> POST /credits/68bbe36f31f60e090e9faa54/charges query=- headers=9
+2025-09-06 02:59:48 INFO  [reactor-http-nio-11] c.n.c.logging.RequestLoggingFilter - << POST /credits/68bbe36f31f60e090e9faa54/charges status=201 took=8ms
+2025-09-06 02:59:48 INFO  [reactor-http-nio-11] c.n.c.logging.RequestLoggingFilter - >> POST /credits/68bbe36f31f60e090e9faa54/charges query=- headers=9
+2025-09-06 02:59:48 INFO  [reactor-http-nio-11] c.n.c.logging.RequestLoggingFilter - << POST /credits/68bbe36f31f60e090e9faa54/charges status=201 took=9ms
+2025-09-06 02:59:49 INFO  [reactor-http-nio-11] c.n.c.logging.RequestLoggingFilter - >> POST /credits/68bbe36f31f60e090e9faa54/charges query=- headers=9
+2025-09-06 02:59:49 INFO  [reactor-http-nio-11] c.n.c.logging.RequestLoggingFilter - << POST /credits/68bbe36f31f60e090e9faa54/charges status=201 took=9ms
+2025-09-06 02:59:49 INFO  [reactor-http-nio-11] c.n.c.logging.RequestLoggingFilter - >> POST /credits/68bbe36f31f60e090e9faa54/charges query=- headers=9
+2025-09-06 02:59:49 INFO  [reactor-http-nio-11] c.n.c.logging.RequestLoggingFilter - << POST /credits/68bbe36f31f60e090e9faa54/charges status=201 took=7ms
+2025-09-06 02:59:50 INFO  [reactor-http-nio-11] c.n.c.logging.RequestLoggingFilter - >> POST /credits/68bbe36f31f60e090e9faa54/charges query=- headers=9
+2025-09-06 02:59:50 INFO  [reactor-http-nio-11] c.n.c.logging.RequestLoggingFilter - << POST /credits/68bbe36f31f60e090e9faa54/charges status=201 took=8ms
+2025-09-06 02:59:51 INFO  [reactor-http-nio-11] c.n.c.logging.RequestLoggingFilter - >> POST /credits/68bbe36f31f60e090e9faa54/charges query=- headers=9
+2025-09-06 02:59:51 INFO  [reactor-http-nio-11] c.n.c.logging.RequestLoggingFilter - << POST /credits/68bbe36f31f60e090e9faa54/charges status=201 took=9ms
+2025-09-06 02:59:52 INFO  [reactor-http-nio-11] c.n.c.logging.RequestLoggingFilter - >> POST /credits/68bbe36f31f60e090e9faa54/charges query=- headers=9
+2025-09-06 02:59:52 INFO  [reactor-http-nio-11] c.n.c.logging.RequestLoggingFilter - << POST /credits/68bbe36f31f60e090e9faa54/charges status=201 took=9ms
+2025-09-06 02:59:54 INFO  [reactor-http-nio-11] c.n.c.logging.RequestLoggingFilter - >> GET /credits/68bbe36f31f60e090e9faa54/movements query=type= headers=7
+2025-09-06 02:59:54 INFO  [reactor-http-nio-11] c.n.c.logging.RequestLoggingFilter - << GET /credits/68bbe36f31f60e090e9faa54/movements status=200 took=6ms
+2025-09-06 03:00:37 INFO  [reactor-http-nio-11] c.n.c.logging.RequestLoggingFilter - >> GET /credits/68bbe36f31f60e090e9faa54 query=- headers=7
+2025-09-06 03:00:37 INFO  [reactor-http-nio-11] c.n.c.logging.RequestLoggingFilter - << GET /credits/68bbe36f31f60e090e9faa54 status=200 took=5ms
+2025-09-06 03:03:28 INFO  [reactor-http-nio-1] c.n.c.logging.RequestLoggingFilter - >> GET /credits query=customerId=string&type=BUSINESS&status=DELINQUENT&includeClosed=false headers=7
+2025-09-06 03:03:28 INFO  [reactor-http-nio-1] c.n.c.logging.RequestLoggingFilter - << GET /credits status=200 took=13ms
+2025-09-06 03:03:51 INFO  [reactor-http-nio-1] c.n.c.logging.RequestLoggingFilter - >> GET /credits query=customerId=&type=BUSINESS&status=&includeClosed=false headers=7
+2025-09-06 03:03:51 INFO  [reactor-http-nio-1] c.n.c.logging.RequestLoggingFilter - << GET /credits status=200 took=18ms
+2025-09-06 03:04:21 INFO  [reactor-http-nio-1] c.n.c.logging.RequestLoggingFilter - >> GET /credits query=customerId=&type=&status=&includeClosed= headers=7
+2025-09-06 03:04:21 INFO  [reactor-http-nio-1] c.n.c.logging.RequestLoggingFilter - << GET /credits status=200 took=11ms
