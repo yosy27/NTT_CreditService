@@ -194,6 +194,7 @@
 							<addCompileSourceRoot>true</addCompileSourceRoot>
 							<supportingFilesToGenerate>ApiUtil.java</supportingFilesToGenerate>
 							<configOptions>
+								<sourceFolder>src/main/java</sourceFolder>
 								<delegatePattern>true</delegatePattern>
 								<reactive>true</reactive>
 								<useSpringfox>true</useSpringfox>
